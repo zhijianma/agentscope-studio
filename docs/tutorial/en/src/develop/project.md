@@ -35,7 +35,7 @@ Projects provide organizational structure for your AI applications, allowing you
 Runs are used to track and organize the complete process of a single execution. With Runs, you can:
 
 - **Track Complete Run History**: Track the entire history of a run in a single thread
-- **Monitor Run Status**: View run status in real-time (RUNNING, FINISHED, ERROR)
+- **Monitor Run Status**: View run status in real-time (Running、Pendding、Done)
 - **View Run Details**: View inputs and outputs of each interaction in a chatbot-like UI
 - **Search Run Records**: Search through run records to find specific interactions
 
@@ -301,12 +301,14 @@ The following flowchart illustrates the complete interaction process:
 Here's a complete example showing how to integrate all three protocols using a `StudioClient` class:
 
 ```python
-import socketio
-import requests
-import shortuuid
+from datetime import datetime
 from queue import Queue
 from threading import Event
-from datetime import datetime
+from typing import Any, List
+
+import requests
+import shortuuid
+import socketio
 
 class StudioClient:
     """Complete Studio client for custom Agent integration"""
@@ -338,18 +340,23 @@ class StudioClient:
 
             # Listen for user input
             @self.sio.on("forwardUserInput", namespace="/python")
-            def receive_user_input(data):
-                request_id = data.get("requestId")
+            def receive_user_input(
+                request_id: str,
+                blocks_input: List[dict],
+                structured_input: dict[str, Any],
+            ) -> None:
                 if request_id in self.input_queues:
-                    self.input_queues[request_id].put(data)
+                    self.input_queues[request_id].put({
+                        "blocks_input": blocks_input,
+                        "structured_input": structured_input,
+                    })
                     self.input_events[request_id].set()
-
-            return True
+                return True
         except Exception as e:
             print(f"Registration failed: {e}")
             return False
 
-    def push_message(self, message_data: dict) -> bool:
+    def push_message(self, replyId: str, message_data: dict) -> bool:
         """Push a message to Studio"""
         if not self.run_id:
             print("Please register run first")
@@ -358,7 +365,9 @@ class StudioClient:
         try:
             payload = {
                 "runId": self.run_id,
-                "replyId": message_data.get("replyId"),
+                "replyId": replyId,
+                "name": replyId,
+                "role": "assistant",
                 "msg": {
                     "id": message_data["id"],
                     "name": message_data["name"],
@@ -431,6 +440,7 @@ run_data = {
 client.register_run(run_data)
 
 # Push a message
+replyId = "reply-1"
 message = {
     "id": "msg-1",
     "name": "my-agent",
@@ -438,7 +448,8 @@ message = {
     "content": [{"type": "text", "text": "Hello! I need your input."}],
     "timestamp": datetime.now().isoformat() + "Z"
 }
-client.push_message(message)
+
+client.push_message(replyId=replyId, message_data=message)
 
 # Request user input
 user_response = client.request_user_input(
