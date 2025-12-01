@@ -356,7 +356,7 @@ class StudioClient:
             print(f"Registration failed: {e}")
             return False
 
-    def push_message(self, replyId: str, message_data: dict) -> bool:
+    def push_message(self, reply_id: str, message_data: dict) -> bool:
         """Push a message to Studio"""
         if not self.run_id:
             print("Please register run first")
@@ -365,8 +365,8 @@ class StudioClient:
         try:
             payload = {
                 "runId": self.run_id,
-                "replyId": replyId,
-                "name": replyId,
+                "replyId": reply_id,
+                "name": reply_id,
                 "role": "assistant",
                 "msg": {
                     "id": message_data["id"],
@@ -440,7 +440,7 @@ run_data = {
 client.register_run(run_data)
 
 # Push a message
-replyId = "reply-1"
+reply_id = "reply-1"
 message = {
     "id": "msg-1",
     "name": "my-agent",
@@ -449,7 +449,7 @@ message = {
     "timestamp": datetime.now().isoformat() + "Z"
 }
 
-client.push_message(replyId=replyId, message_data=message)
+client.push_message(reply_id=reply_id, message_data=message)
 
 # Request user input
 user_response = client.request_user_input(
