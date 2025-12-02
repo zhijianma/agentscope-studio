@@ -1,5 +1,4 @@
 import * as trpcExpress from '@trpc/server/adapters/express';
-import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
 import opener from 'opener';
@@ -94,16 +93,6 @@ async function initializeServer() {
         const app = express();
         const httpServer = createServer(app);
 
-        // Enable CORS for all routes (needed for external Python clients)
-        app.use(
-            cors({
-                origin: '*', // Allow all origins
-                methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-                allowedHeaders: ['Content-Type', 'Authorization'],
-                credentials: false,
-            }),
-        );
-
         // Initialize the database
         await initializeDatabase(config.database);
 
@@ -118,14 +107,8 @@ async function initializeServer() {
         app.use(
             '/v1',
             express.raw({
-                // Support various protobuf and JSON content types
-                type: [
-                    'application/x-protobuf',
-                    'application/vnd.google.protobuf',
-                    'application/protobuf',
-                    'application/json',
-                    'application/octet-stream', // Some clients send protobuf as octet-stream
-                ],
+                // Support OpenTelemetry OTLP content types
+                type: ['application/x-protobuf', 'application/json'],
                 limit: '10mb',
             }),
             otelRouter,
@@ -144,7 +127,7 @@ async function initializeServer() {
         } catch (error) {
             console.warn(
                 `[OTEL gRPC] Failed to start gRPC server on port ${finalGrpcPort}, ` +
-                    'traces will be received via HTTP endpoint /v1/traces:',
+                'traces will be received via HTTP endpoint /v1/traces:',
                 error instanceof Error ? error.message : error,
             );
         }
