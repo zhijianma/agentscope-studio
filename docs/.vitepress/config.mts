@@ -13,7 +13,7 @@ const sharedThemeConfig = {
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
     srcDir: 'tutorial',
-    base: '/agentscope-studio/',
+    base: '/',
 
     title: 'AgentScope-Studio',
     description: 'A development-oriented visualization toolkit for AgentScope',
