@@ -1,18 +1,6 @@
-import { Key, memo, MouseEvent, useState } from 'react';
 import AsTable from '@/components/tables/AsTable';
 import { NumberCell, TagsCell, TextCell } from '@/components/tables/utils.tsx';
-import { useNavigate } from 'react-router-dom';
-import NumericalView from './MetricView/NumericalView.tsx';
-import { convertToDTO } from './utils.ts';
-import { TableColumnsType } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { ModelCard, ToolCard } from '@/pages/EvalPage/EvaluationPage/DataCard';
-import { useEvaluationContext } from '@/context/EvaluationContext.tsx';
-import {
-    useEvaluationTasksContext,
-    EvaluationTasksContextProvider,
-} from '@/context/EvaluationTasksContext.tsx';
-import { EvalTaskMeta } from '@shared/types/evaluation.ts';
+import { Button } from '@/components/ui/button.tsx';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,16 +11,29 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import { CirclePlusIcon, SearchIcon } from 'lucide-react';
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupInput,
 } from '@/components/ui/input-group.tsx';
-import { Checkbox } from '@/components/ui/checkbox.tsx';
-import { ArrayFilterOperator } from '@shared/types';
+import { useEvaluationContext } from '@/context/EvaluationContext.tsx';
+import {
+    EvaluationTasksContextProvider,
+    useEvaluationTasksContext,
+} from '@/context/EvaluationTasksContext.tsx';
+import { ModelCard, ToolCard } from '@/pages/EvalPage/EvaluationPage/DataCard';
+import { EvalTaskMeta } from '@shared/types/evaluation.ts';
+import { TableColumnsType } from 'antd';
+import { CirclePlusIcon, SearchIcon } from 'lucide-react';
+import { Key, memo, MouseEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import NumericalView from './MetricView/NumericalView.tsx';
+import { convertToDTO } from './utils.ts';
+// import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { EmptyPage } from '@/pages/DefaultPage/index.tsx';
+import { ArrayFilterOperator } from '@shared/types';
+import { Checkbox } from 'antd';
 
 const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     const navigate = useNavigate();
@@ -496,7 +497,7 @@ const EvaluationPage = () => {
                             <div className="text-2xl font-bold">
                                 {evaluationDTO
                                     ? evaluationDTO.nPromptTokens +
-                                      evaluationDTO.nCompletionTokens
+                                    evaluationDTO.nCompletionTokens
                                     : 'N/A'}
                             </div>
                             <div className="flex items-center justify-between mt-2">

@@ -2,19 +2,19 @@ import { EvalResult } from '@shared/types/evaluation.ts';
 
 export type MetricsDTO =
     | {
-          type: 'numerical';
-          scores: {
-              [repeatId: string]: number;
-          };
-      }
+        type: 'numerical';
+        scores: {
+            [repeatId: string]: number;
+        };
+    }
     | {
-          type: 'category';
-          scores: {
-              [repeatId: string]: {
-                  [category: string]: number;
-              };
-          };
-      };
+        type: 'category';
+        scores: {
+            [repeatId: string]: {
+                [category: string]: number;
+            };
+        };
+    };
 
 export interface MetricsRecord {
     [metricName: string]: {
@@ -62,7 +62,8 @@ export const convertToDTO = (data: EvalResult | undefined) => {
     let nPromptTokens = 0;
     let nCompletionTokens = 0;
 
-    Object.values(data.total_stats.chat_usage).forEach((usage) => {
+
+    Object.values(data.total_stats?.chat_usage || {}).forEach((usage) => {
         nPromptTokens += usage.input_tokens;
         nCompletionTokens += usage.output_tokens;
     });

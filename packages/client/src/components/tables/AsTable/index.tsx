@@ -1,24 +1,24 @@
-import { memo, useMemo, useCallback, Key, useState, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Table, TableColumnsType, TableColumnType } from 'antd';
 import { TableProps } from 'antd/es/table/InternalTable';
+import { Key, memo, ReactNode, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import EmptyData from '@/components/tables/EmptyData.tsx';
-import { renderSortIcon, renderTitle } from '@/components/tables/utils.tsx';
 import { AsPagination } from '@/components/tables/pagination.tsx';
-import { StringFilterOperator, TableRequestParams } from '@shared/types';
-import {
-    InputGroup,
-    InputGroupAddon,
-    InputGroupButton,
-    InputGroupInput,
-} from '@/components/ui/input-group.tsx';
+import { renderSortIcon, renderTitle } from '@/components/tables/utils.tsx';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupInput,
+} from '@/components/ui/input-group.tsx';
+import { StringFilterOperator, TableRequestParams } from '@shared/types';
 import { ChevronDownIcon } from 'lucide-react';
 
 interface AsTableProps<T> extends Omit<TableProps<T>, 'columns'> {
@@ -28,7 +28,7 @@ interface AsTableProps<T> extends Omit<TableProps<T>, 'columns'> {
         updateFn: (params: TableRequestParams) => TableRequestParams,
     ) => void;
     total: number;
-    selectedRowKeys: Key[];
+    selectedRowKeys: Key[] | undefined | null | (() => Key[]);
     setSelectedRowKeys: (keys: Key[]) => void;
     actions?: ReactNode;
     searchableColumns: Key[];
@@ -101,9 +101,9 @@ const AsTable = <T extends object>({
                 ellipsis: true,
                 sorter: columnKey
                     ? (a: T, b: T) => {
-                          const result = generalSorter(a, b, columnKey);
-                          return result ?? 0;
-                      }
+                        const result = generalSorter(a, b, columnKey);
+                        return result ?? 0;
+                    }
                     : false,
                 sortIcon: (sortOrder) => renderSortIcon(sortOrder, true),
             };

@@ -1,3 +1,7 @@
+import { trpc, trpcClient } from '@/api/trpc.ts';
+import { useMessageApi } from '@/context/MessageApiContext.tsx';
+import { ResponseBody, TableRequestParams } from '@shared/types';
+import { Evaluation } from '@shared/types/evaluation.ts';
 import {
     createContext,
     ReactNode,
@@ -5,10 +9,6 @@ import {
     useEffect,
     useState,
 } from 'react';
-import { ResponseBody, TableRequestParams } from '@shared/types';
-import { useMessageApi } from '@/context/MessageApiContext.tsx';
-import { trpc, trpcClient } from '@/api/trpc.ts';
-import { Evaluation } from '@shared/types/evaluation.ts';
 
 interface EvaluationListContextType {
     tableDataSource: Evaluation[];
@@ -113,6 +113,7 @@ export function EvaluationListContextProvider({
         const backendResponse: ResponseBody = jsonData.result.data;
         if (backendResponse.success) {
             // messageApi.info(backendResponse.message);
+            refetch();
             return true;
         } else {
             messageApi.error(backendResponse.message);

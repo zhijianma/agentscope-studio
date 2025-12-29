@@ -1,5 +1,6 @@
-import { CSSProperties, memo } from 'react';
+import { formatNumber } from '@/utils/common';
 import { Flex } from 'antd';
+import { CSSProperties, memo } from 'react';
 import SlotCounter from 'react-slot-counter';
 
 /**
@@ -20,15 +21,20 @@ const NumberCounter = ({ number, style = {} }: Props) => {
     const validNumber =
         typeof number === 'number' && !isNaN(number) ? number : 0;
 
+    const formattedNumber = formatNumber(validNumber);
+    const match = /([0-9.,\s\u00A0]*)([KMBT]?)$/.exec(formattedNumber);
+    const numericPart = match ? match[1] : formattedNumber;
+    const unitPart = match ? match[2] : '';
     return (
         <Flex style={{ ...style }} align="center">
             <SlotCounter
                 startValue={0}
                 startValueOnce
-                value={validNumber.toLocaleString()}
+                value={numericPart}
                 sequentialAnimationMode
-                // useMonospaceWidth
+            // useMonospaceWidth
             />
+            {unitPart && <span>{unitPart}</span>}
         </Flex>
     );
 };
