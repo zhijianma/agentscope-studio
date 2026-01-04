@@ -101,9 +101,9 @@ const AsTable = <T extends object>({
                 ellipsis: true,
                 sorter: columnKey
                     ? (a: T, b: T) => {
-                        const result = generalSorter(a, b, columnKey);
-                        return result ?? 0;
-                    }
+                          const result = generalSorter(a, b, columnKey);
+                          return result ?? 0;
+                      }
                     : false,
                 sortIcon: (sortOrder) => renderSortIcon(sortOrder, true),
             };
@@ -151,7 +151,7 @@ const AsTable = <T extends object>({
 
     const handleSearch = (searchText: string) => {
         setTableRequestParams((prevParams) => {
-            if (searchField && searchText.length > 0) {
+            if (searchField) {
                 const newFilters = {
                     [searchField]: {
                         operator: StringFilterOperator.CONTAINS,

@@ -55,6 +55,12 @@ const RangeFilterSchema = z.object({
     value: z.tuple([z.number(), z.number()]),
 });
 
+// String range filter for timestamp comparisons (BigInt as string)
+const StringRangeFilterSchema = z.object({
+    operator: z.nativeEnum(RangeFilterOperator),
+    value: z.tuple([z.string(), z.string()]),
+});
+
 const StringFilterSchema = z.object({
     operator: z.nativeEnum(StringFilterOperator),
     value: z.string(),
@@ -86,6 +92,7 @@ const BasicTableParamsSchema = {
             z.union([
                 NumericFilterSchema,
                 RangeFilterSchema,
+                StringRangeFilterSchema,
                 StringFilterSchema,
                 ArrayFilterSchema,
                 ArrayElementContainsFilterSchema,
@@ -337,18 +344,6 @@ export interface TableData<T> {
     page: number;
     pageSize: number;
 }
-
-// TracePage trpc schemas
-export const GetTraceListParamsSchema = z.object({
-    serviceName: z.string().optional(),
-    operationName: z.string().optional(),
-    status: z.number().optional(),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
-    limit: z.number().optional(),
-    offset: z.number().optional(),
-});
-export type GetTraceListParams = z.infer<typeof GetTraceListParamsSchema>;
 
 export const GetTraceParamsSchema = z.object({
     traceId: z.string(),

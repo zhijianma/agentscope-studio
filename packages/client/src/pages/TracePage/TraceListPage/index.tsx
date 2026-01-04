@@ -1,6 +1,6 @@
 import { TableColumnsType } from 'antd';
 import { CheckCircle2Icon, CopyIcon, InfoIcon } from 'lucide-react';
-import { memo, useMemo } from 'react';
+import { Key, memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import NumberCounter from '@/components/numbers/NumberCounter';
@@ -15,10 +15,15 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip.tsx';
 import { useTraceContext } from '@/context/TraceContext';
-import { copyToClipboard } from '@/utils/common';
+import {
+    copyToClipboard,
+    formatDateTime,
+    formatDuration,
+    formatDurationWithUnit,
+    formatNumber,
+} from '@/utils/common';
 import { TraceListItem } from '@shared/types';
 import TraceDetailPage from '../TraceDetailPage';
-import { formatDateTime, formatNumber, formatDuration, formatDurationWithUnit } from '@/utils/common';
 
 // Helper component for statistic cards
 const StatCard = ({
@@ -75,11 +80,8 @@ const TraceListPage = () => {
         timeRange,
         setTimeRange,
 
-        // Pagination state
-        page,
-        setPage,
-        pageSize,
-        setPageSize,
+        tableRequestParams,
+        setTableRequestParams,
 
         // Data
         traces,
@@ -94,7 +96,17 @@ const TraceListPage = () => {
         drawerOpen,
         setDrawerOpen,
     } = useTraceContext();
-    
+
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+
+    // Filter the selected rows when traces data changes
+    useEffect(() => {
+        const existedSpanIds = traces.map((trace) => trace.spanId);
+        setSelectedRowKeys((prevRowKeys) =>
+            prevRowKeys.filter((id) => existedSpanIds.includes(id as string)),
+        );
+    }, [traces]);
+
     const getStatusDisplay = (status: number) => {
         if (status === 2) {
             return (
@@ -281,7 +293,12 @@ const TraceListPage = () => {
                             ? formatDuration(statistics.avgDuration)
                             : '-'
                     }
-                    unit={statistics?.avgDuration !== undefined && statistics.avgDuration < 1 ? 'ms' : 's'}
+                    unit={
+                        statistics?.avgDuration !== undefined &&
+                        statistics.avgDuration < 1
+                            ? 'ms'
+                            : 's'
+                    }
                 />
             </div>
 
@@ -297,32 +314,20 @@ const TraceListPage = () => {
                     columns={columns}
                     dataSource={traces}
                     loading={isLoading}
-                    rowKey="traceId"
-                    onRow={(record) => ({
+                    rowKey="spanId"
+                    onRow={(record: TraceListItem) => ({
                         onClick: () => {
                             setSelectedTraceId(record.traceId);
                             setDrawerOpen(true);
                         },
                         className: 'cursor-pointer',
                     })}
-                    pagination={{
-                        current: page,
-                        pageSize: pageSize,
-                        total: total,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
-                        showTotal: (total) => `${t('common.total')}: ${total}`,
-                        onChange: (newPage, newPageSize) => {
-                            setPage(newPage);
-                            setPageSize(newPageSize);
-                        },
-                        className: 'mr-4!',
-                    }}
                     total={total}
-                    // tableRequestParams={}
-                    // setTableRequestParams={}
-                    // selectedRowKeys={}
-                    // setSelectedRowKeys={}
+                    tableRequestParams={tableRequestParams}
+                    setTableRequestParams={setTableRequestParams}
+                    selectedRowKeys={selectedRowKeys}
+                    setSelectedRowKeys={setSelectedRowKeys}
+                    searchableColumns={['name']}
                 />
             </div>
 

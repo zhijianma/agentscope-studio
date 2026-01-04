@@ -1,41 +1,40 @@
+import { EvaluationDao } from '@/dao/evaluation';
+import { FileDao } from '@/dao/File';
+import { verifyMetadataByVersion } from '@/trpc/utils-evaluation';
 import { initTRPC, TRPCError } from '@trpc/server';
-import { z } from 'zod';
 import fs from 'fs';
+import path from 'path';
+import { z } from 'zod';
 import {
+    BlockType,
+    ContentBlocks,
+    DeleteEvaluationsParamsSchema,
     GetEvaluationResultParamsSchema,
-    GetTraceListParamsSchema,
+    GetEvaluationTasksParamsSchema,
     GetTraceParamsSchema,
     GetTraceStatisticParamsSchema,
     InputRequestData,
-    // RunData,
-    TableData,
+    MessageForm,
     ProjectData,
-    TableRequestParamsSchema,
-    ResponseBody,
     RegisterReplyParams,
     RegisterReplyParamsSchema,
+    ResponseBody,
     RunData,
-    BlockType,
-    ContentBlocks,
-    MessageForm,
     Status,
-    DeleteEvaluationsParamsSchema,
-    GetEvaluationTasksParamsSchema,
+    // RunData,
+    TableData,
     TableRequestParams,
+    TableRequestParamsSchema,
 } from '../../../shared/src';
-import { RunDao } from '../dao/Run';
+import { FridayConfigManager } from '../../../shared/src/config/friday';
+import { EvalResult, Evaluation } from '../../../shared/src/types/evaluation';
+import { FridayAppMessageDao } from '../dao/FridayAppMessage';
 import { InputRequestDao } from '../dao/InputRequest';
 import { MessageDao } from '../dao/Message';
-import { SocketManager } from './socket';
-import { FridayConfigManager } from '../../../shared/src/config/friday';
-import { FridayAppMessageDao } from '../dao/FridayAppMessage';
 import { ReplyDao } from '../dao/Reply';
+import { RunDao } from '../dao/Run';
 import { SpanDao } from '../dao/Trace';
-import { verifyMetadataByVersion } from '@/trpc/utils-evaluation';
-import path from 'path';
-import { EvaluationDao } from '@/dao/evaluation';
-import { Evaluation, EvalResult } from '../../../shared/src/types/evaluation';
-import { FileDao } from '@/dao/File';
+import { SocketManager } from './socket';
 
 const textBlock = z.object({
     text: z.string(),
@@ -409,19 +408,15 @@ export const appRouter = t.router({
             }
         }),
 
-    getTraceList: t.procedure
-        .input(GetTraceListParamsSchema)
+    getTraces: t.procedure
+        .input(TableRequestParamsSchema)
         .query(async ({ input }) => {
             try {
-                console.debug('[TRPC] getTraceList called with input:', input);
-                const result = await SpanDao.getTraceList(input);
-                console.debug('[TRPC] getTraceList result:', {
-                    total: result.total,
-                    tracesCount: result.traces.length,
-                });
+                console.debug('[TRPC] getTraces called with input:', input);
+                const result = await SpanDao.getTraces(input);
                 return result;
             } catch (error) {
-                console.error('Error in getTraceList:', error);
+                console.error('Error in getTraces:', error);
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
                     message:
@@ -632,6 +627,7 @@ export const appRouter = t.router({
         .input(TableRequestParamsSchema)
         .query(async ({ input }) => {
             try {
+                console.log('getEvaluations input: ', input);
                 const result = await EvaluationDao.getEvaluations(input);
                 return {
                     success: true,

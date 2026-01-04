@@ -32,7 +32,7 @@ const NumberCounter = ({ number, style = {} }: Props) => {
                 startValueOnce
                 value={numericPart}
                 sequentialAnimationMode
-            // useMonospaceWidth
+                // useMonospaceWidth
             />
             {unitPart && <span>{unitPart}</span>}
         </Flex>

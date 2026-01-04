@@ -497,7 +497,7 @@ const EvaluationPage = () => {
                             <div className="text-2xl font-bold">
                                 {evaluationDTO
                                     ? evaluationDTO.nPromptTokens +
-                                    evaluationDTO.nCompletionTokens
+                                      evaluationDTO.nCompletionTokens
                                     : 'N/A'}
                             </div>
                             <div className="flex items-center justify-between mt-2">

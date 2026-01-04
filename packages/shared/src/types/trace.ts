@@ -90,6 +90,7 @@ export interface SpanData {
 // Trace list item interface for UI display
 export interface TraceListItem {
     traceId: string;
+    spanId: string; // Unique identifier for each row (root or orphan span)
     name: string;
     startTime: string;
     endTime: string;
