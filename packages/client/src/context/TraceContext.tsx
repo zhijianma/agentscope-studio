@@ -41,6 +41,8 @@ export interface TraceContextType {
     // Selected trace
     selectedTraceId: string | null;
     setSelectedTraceId: (traceId: string | null) => void;
+    selectedRootSpanId: string | null; // For orphan spans, only show this span and its descendants
+    setSelectedRootSpanId: (spanId: string | null) => void;
     drawerOpen: boolean;
     setDrawerOpen: (open: boolean) => void;
 
@@ -123,6 +125,9 @@ export function TraceContextProvider({
 
     // Selected trace
     const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
+    const [selectedRootSpanId, setSelectedRootSpanId] = useState<string | null>(
+        null,
+    );
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     // Wrapper for setTimeRange that also updates tableRequestParams.filters
@@ -232,6 +237,8 @@ export function TraceContextProvider({
             // Selected trace
             selectedTraceId,
             setSelectedTraceId,
+            selectedRootSpanId,
+            setSelectedRootSpanId,
             drawerOpen,
             setDrawerOpen,
 
@@ -253,6 +260,7 @@ export function TraceContextProvider({
             error,
             traceListData?.total,
             selectedTraceId,
+            selectedRootSpanId,
             drawerOpen,
             refetch,
             refetchStatistics,

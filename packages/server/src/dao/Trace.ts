@@ -435,6 +435,7 @@ export class SpanDao {
             status: number;
             spanCount: number;
             totalTokens?: number;
+            isOrphan: boolean;
         }>;
         total: number;
     }> {
@@ -463,6 +464,13 @@ export class SpanDao {
                 SELECT SUM(COALESCE(totalTokens, 0)) FROM descendants
             )`;
 
+            // Subquery to check if a span is orphan
+            const isOrphanSubquery = `(
+                span.parentSpanId IS NOT NULL
+                AND span.parentSpanId != ''
+                AND span.parentSpanId NOT IN (SELECT p.spanId FROM span_table p WHERE p.traceId = span.traceId)
+            )`;
+
             const queryBuilder = SpanTable.createQueryBuilder('span')
                 .select('span.traceId', 'traceId')
                 .addSelect('span.spanId', 'spanId')
@@ -472,6 +480,7 @@ export class SpanDao {
                 .addSelect('span.statusCode', 'status')
                 .addSelect(spanCountSubquery, 'spanCount')
                 .addSelect(totalTokensSubquery, 'totalTokens')
+                .addSelect(isOrphanSubquery, 'isOrphan')
                 .where(
                     `(
                         (span.parentSpanId IS NULL OR span.parentSpanId = '')
@@ -570,6 +579,7 @@ export class SpanDao {
                 status: number | string;
                 spanCount: number | string;
                 totalTokens: number | string | null;
+                isOrphan: number | boolean;
             }
 
             const traces = results.map((row: TraceListRow) => {
@@ -591,6 +601,7 @@ export class SpanDao {
                         row.totalTokens !== undefined
                             ? Number(row.totalTokens)
                             : undefined,
+                    isOrphan: Boolean(row.isOrphan),
                 };
             });
 
