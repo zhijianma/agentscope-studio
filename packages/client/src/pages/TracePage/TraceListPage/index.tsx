@@ -282,7 +282,7 @@ const TraceListPage = () => {
                     }
                     unit={
                         statistics?.avgDuration !== undefined &&
-                        statistics.avgDuration < 1
+                            statistics.avgDuration < 1
                             ? 'ms'
                             : 's'
                     }
