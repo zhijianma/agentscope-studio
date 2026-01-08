@@ -254,7 +254,7 @@ const TraceDetailPage = ({ traceId }: TraceDetailPageProps) => {
         const duration =
             Number(
                 BigInt(node.span.endTimeUnixNano) -
-                BigInt(node.span.startTimeUnixNano),
+                    BigInt(node.span.startTimeUnixNano),
             ) / 1e9;
         const isSelected = selectedSpanId === node.span.spanId;
         const hasChildren = node.children && node.children.length > 0;
@@ -262,8 +262,9 @@ const TraceDetailPage = ({ traceId }: TraceDetailPageProps) => {
         return (
             <div key={node.span.spanId} className="w-full">
                 <div
-                    className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted overflow-hidden ${isSelected ? 'bg-muted' : ''
-                        }`}
+                    className={`flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted overflow-hidden ${
+                        isSelected ? 'bg-muted' : ''
+                    }`}
                     style={{ paddingLeft: `${level * 16 + 8}px` }}
                     onClick={() => setSelectedSpanId(node.span.spanId)}
                 >
@@ -442,9 +443,9 @@ const TraceDetailPage = ({ traceId }: TraceDetailPageProps) => {
                                             BigInt(
                                                 displaySpan.endTimeUnixNano,
                                             ) -
-                                            BigInt(
-                                                displaySpan.startTimeUnixNano,
-                                            ),
+                                                BigInt(
+                                                    displaySpan.startTimeUnixNano,
+                                                ),
                                         ) / 1e9,
                                     )}
                                 </div>
