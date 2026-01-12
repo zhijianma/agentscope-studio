@@ -302,6 +302,7 @@ const TraceListPage = () => {
                     dataSource={traces}
                     loading={isLoading}
                     rowKey="spanId"
+                    searchType="trace"
                     onRow={(record: Trace) => ({
                         onClick: () => {
                             setSelectedTraceId(record.traceId);

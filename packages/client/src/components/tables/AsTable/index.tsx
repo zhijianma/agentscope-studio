@@ -32,6 +32,8 @@ interface AsTableProps<T> extends Omit<TableProps<T>, 'columns'> {
     setSelectedRowKeys: (keys: Key[]) => void;
     actions?: ReactNode;
     searchableColumns: Key[];
+    /** Type for search placeholder, e.g., 'project', 'trace', 'evaluation' */
+    searchType?: string;
 }
 
 const AsTable = <T extends object>({
@@ -43,6 +45,7 @@ const AsTable = <T extends object>({
     setSelectedRowKeys,
     actions,
     searchableColumns = [],
+    searchType,
     ...rest
 }: AsTableProps<T>) => {
     const { t } = useTranslation();
@@ -206,7 +209,11 @@ const AsTable = <T extends object>({
             <div className="flex flex-row gap-2 items-center">
                 <InputGroup className="max-w-96">
                     <InputGroupInput
-                        placeholder={t('placeholder.search-evaluation-task')}
+                        placeholder={
+                            searchType
+                                ? t(`placeholder.search-${searchType}`)
+                                : t('action.search')
+                        }
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         onKeyUp={(e) => {

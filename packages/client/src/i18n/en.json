@@ -186,9 +186,10 @@
         "search-benchmark": "Search benchmarks",
         "search-evaluation": "Search evaluation history",
         "search-evaluation-task": "Search evaluation tasks",
-        "search-project": "Search projects in the table",
-        "search-run": "Search runs in the table",
-        "search-span": "Search spans in the trace"
+        "search-project": "Search projects history",
+        "search-run": "Search runs",
+        "search-span": "Search spans",
+        "search-trace": "Search traces"
     },
     "status": {
         "done": "Done",

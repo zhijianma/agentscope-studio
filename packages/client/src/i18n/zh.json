@@ -188,7 +188,8 @@
         "search-evaluation-task": "搜索评测任务",
         "search-project": "搜索项目",
         "search-run": "搜索运行实例",
-        "search-span": "搜索跟踪数据"
+        "search-span": "搜索跟踪数据",
+        "search-trace": "搜索跟踪数据"
     },
     "status": {
         "done": "已结束",

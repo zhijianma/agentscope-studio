@@ -142,6 +142,7 @@ const OverviewPage = () => {
 
             <div className="flex-1 min-h-0 w-full">
                 <AsTable<Evaluation>
+                    searchType="evaluation"
                     locale={{
                         emptyText: (
                             <EmptyPage

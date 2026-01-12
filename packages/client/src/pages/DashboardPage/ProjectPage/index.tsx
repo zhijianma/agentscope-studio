@@ -114,6 +114,7 @@ const ProjectPage = () => {
                 <AsTable<ProjectData>
                     columns={columns}
                     searchableColumns={['project']}
+                    searchType="project"
                     dataSource={tableDataSource}
                     loading={tableLoading}
                     onRow={(record: ProjectData) => {

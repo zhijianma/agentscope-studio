@@ -173,6 +173,7 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
                     <AsTable<EvalTaskMeta>
                         columns={columns}
                         searchableColumns={['id', 'input']}
+                        searchType="evaluation-task"
                         loading={tableLoading}
                         dataSource={tableDataSource}
                         onRow={(record: EvalTaskMeta) => {
