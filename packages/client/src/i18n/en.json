@@ -189,7 +189,8 @@
         "search-project": "Search projects history",
         "search-run": "Search runs",
         "search-span": "Search spans",
-        "search-trace": "Search traces"
+        "search-trace": "Search traces",
+        "input-directory-path": "Enter directory path"
     },
     "status": {
         "done": "Done",

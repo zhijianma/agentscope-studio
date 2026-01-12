@@ -1,8 +1,11 @@
-import { memo, useEffect, useState, useCallback } from 'react';
-import { Tree, TreeDataNode, Input } from 'antd';
-import { FolderOutlined, FileOutlined } from '@ant-design/icons';
-import type { Key } from 'react';
+import { FileOutlined, FolderOutlined } from '@ant-design/icons';
 import { FileItem } from '@shared/types/file.ts';
+import { Input, Tree, TreeDataNode } from 'antd';
+import type { Key } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { trpc } from '@/api/trpc';
 
 interface Props {
     type: 'file' | 'directory' | 'both';
@@ -24,43 +27,46 @@ const getInitialPath = () => {
     if (userAgent.includes('mac')) {
         return '/Users/';
     }
-    return '/home';
+    // Linux and BSD systems
+    if (userAgent.includes('linux') || userAgent.includes('bsd')) {
+        return '/home/';
+    }
+    // Default
+    return '/';
 };
 
 const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
+    const { t } = useTranslation();
     const [currentPath, setCurrentPath] = useState<string>(getInitialPath());
     const [treeData, setTreeData] = useState<CustomTreeDataNode[]>([]);
 
-    // Obtain directory from local file system
+    // Use trpc mutation for listing directory
+    const listDirMutation = trpc.listDir.useMutation();
+
+    // Convert FileItem to CustomTreeDataNode
+    const mapToTreeNode = useCallback((item: FileItem): CustomTreeDataNode => {
+        return {
+            title: item.name,
+            key: item.path,
+            children: item.isDirectory ? [] : undefined,
+            isLeaf: !item.isDirectory,
+            icon: item.isDirectory ? <FolderOutlined /> : <FileOutlined />,
+            selectable: item.isDirectory,
+            isDirectory: item.isDirectory,
+        };
+    }, []);
+
+    // Fetch directory data using trpc
     const fetchDirData = useCallback(
         async (path: string): Promise<CustomTreeDataNode[]> => {
             try {
-                const response = await fetch('/trpc/listDir', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path }),
-                });
-                console.log(response);
-                const data = await response.json();
+                const result = await listDirMutation.mutateAsync({ path });
                 if (
-                    data.result.data.success &&
-                    Array.isArray(data.result.data.data)
+                    result.success &&
+                    'data' in result &&
+                    Array.isArray(result.data)
                 ) {
-                    return data.result.data.data.map((item: FileItem) => {
-                        return {
-                            title: item.name,
-                            key: item.path,
-                            children: item.isDirectory ? [] : undefined,
-                            isLeaf: !item.isDirectory,
-                            icon: item.isDirectory ? (
-                                <FolderOutlined />
-                            ) : (
-                                <FileOutlined />
-                            ),
-                            selectable: item.isDirectory,
-                            isDirectory: item.isDirectory,
-                        } as CustomTreeDataNode;
-                    });
+                    return result.data.map(mapToTreeNode);
                 }
                 return [];
             } catch (error) {
@@ -68,10 +74,10 @@ const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
                 return [];
             }
         },
-        [],
+        [listDirMutation, mapToTreeNode],
     );
 
-    // 初始化根目录
+    // Initialize root directory
     useEffect(() => {
         const initializeTree = async () => {
             const items = await fetchDirData(currentPath);
@@ -79,7 +85,7 @@ const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
         };
 
         initializeTree();
-    }, [currentPath, fetchDirData]);
+    }, [currentPath]);
 
     const updateNodeChildren = (
         nodes: CustomTreeDataNode[],
@@ -122,7 +128,7 @@ const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
                 variant="filled"
                 value={currentPath}
                 onChange={(e) => setCurrentPath(e.target.value)}
-                placeholder="输入目录路径"
+                placeholder={t('placeholder.input-directory-path')}
             />
 
             <Tree
