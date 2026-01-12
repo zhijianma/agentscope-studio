@@ -1,22 +1,3 @@
-import { memo, useEffect, useState } from 'react';
-import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Tooltip,
-    XAxis,
-    YAxis,
-    LineChart,
-    Line,
-} from 'recharts';
-import { arrayToCDF, MetricsDTO } from '../utils.ts';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select.tsx';
 import {
     Card,
     CardAction,
@@ -32,6 +13,25 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart.tsx';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select.tsx';
+import { memo, useEffect, useState } from 'react';
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Line,
+    LineChart,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
+import { arrayToCDF, MetricsDTO } from '../utils.ts';
 
 interface Props {
     metrics: Record<string, MetricsDTO>;
@@ -68,13 +68,17 @@ const NumericalMetricView = ({ metrics }: Props) => {
                     metric.
                 </CardDescription>
                 <CardAction className="flex flex-row gap-2">
-                    <Select value={selectedMetric}>
+                    <Select
+                        value={selectedMetric}
+                        onValueChange={setSelectedMetric}
+                    >
                         <SelectTrigger size="sm">
                             <SelectValue placeholder="Select a metric" />
                         </SelectTrigger>
                         <SelectContent>
                             {Object.keys(metrics).map((metricName) => (
                                 <SelectItem
+                                    key={metricName}
                                     className="truncate"
                                     value={metricName}
                                 >

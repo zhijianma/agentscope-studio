@@ -84,7 +84,7 @@ export function ProjectListRoomContextProvider({
                 (response: { success: boolean; message?: string }) => {
                     if (response.success) {
                         messageApi.success('Projects deleted successfully.');
-                        refetch(); // 删除成功后刷新数据
+                        refetch();
                         resolve();
                     } else {
                         const errorMsg =

@@ -14,14 +14,16 @@ interface EvaluationTaskContextType {
     task: EvalTask;
 }
 
-const EvaluationTaskContext = createContext<EvaluationTaskContextType | null>(null);
+const EvaluationTaskContext = createContext<EvaluationTaskContextType | null>(
+    null,
+);
 
 interface Props {
     children: ReactNode;
 }
 
 export function EvaluationTaskContextProvider({ children }: Props) {
-    const { evalId: evaluationId, taskId: taskId } = useParams<{
+    const { evalId: evaluationId, taskId } = useParams<{
         evalId: string;
         taskId: string;
     }>();

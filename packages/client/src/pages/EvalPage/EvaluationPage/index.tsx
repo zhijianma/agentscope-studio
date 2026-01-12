@@ -45,9 +45,9 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
         tableRequestParams,
         setTableRequestParams,
         total,
+        tags,
     } = useEvaluationTasksContext();
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-    const { tags } = useEvaluationTasksContext();
 
     const columns: TableColumnsType<EvalTaskMeta> = [
         {
@@ -177,6 +177,7 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
                         searchType="evaluation-task"
                         loading={tableLoading}
                         dataSource={tableDataSource}
+                        rowKey="id"
                         onRow={(record: EvalTaskMeta) => {
                             return {
                                 onClick: (event: MouseEvent) => {
