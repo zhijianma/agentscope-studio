@@ -23,16 +23,16 @@ export interface TraceContextType {
     traces: Trace[];
     statistics: TraceStatistics | undefined;
     traceData:
-        | {
-              traceId: string;
-              spans: import('@shared/types/trace').SpanData[];
-              startTime: string;
-              endTime: string;
-              duration: number;
-              status: number;
-              totalTokens?: number;
-          }
-        | undefined; // Selected trace detail data
+    | {
+        traceId: string;
+        spans: import('@shared/types/trace').SpanData[];
+        startTime: string;
+        endTime: string;
+        duration: number;
+        status: number;
+        totalTokens?: number;
+    }
+    | undefined; // Selected trace detail data
     isLoading: boolean;
     isLoadingTrace: boolean;
     error: Error | null;
@@ -104,7 +104,7 @@ export function TraceContextProvider({
 
     // Initialize tableRequestParams with time range filter
     const initialTimeRange = getTimeRangeValues('week');
-    const [tableRequestParams, setTableRequestParamsState] =
+    const [tableRequestParams, setTableRequestParams] =
         useState<TableRequestParams>({
             pagination: {
                 page: 1,
@@ -112,14 +112,14 @@ export function TraceContextProvider({
             },
             filters: initialTimeRange
                 ? {
-                      timeRange: {
-                          operator: RangeFilterOperator.BETWEEN,
-                          value: [
-                              initialTimeRange.startTime,
-                              initialTimeRange.endTime,
-                          ],
-                      },
-                  }
+                    timeRange: {
+                        operator: RangeFilterOperator.BETWEEN,
+                        value: [
+                            initialTimeRange.startTime,
+                            initialTimeRange.endTime,
+                        ],
+                    },
+                }
                 : undefined,
         });
 
@@ -134,23 +134,23 @@ export function TraceContextProvider({
     const setTimeRange = (range: 'week' | 'month' | 'all') => {
         setTimeRangeState(range);
         const timeValues = getTimeRangeValues(range);
-        setTableRequestParamsState((prev) => ({
+        setTableRequestParams((prev) => ({
             ...prev,
             pagination: { ...prev.pagination, page: 1 }, // Reset to first page
             filters: timeValues
                 ? {
-                      ...prev.filters,
-                      timeRange: {
-                          operator: RangeFilterOperator.BETWEEN,
-                          value: [timeValues.startTime, timeValues.endTime],
-                      },
-                  }
+                    ...prev.filters,
+                    timeRange: {
+                        operator: RangeFilterOperator.BETWEEN,
+                        value: [timeValues.startTime, timeValues.endTime],
+                    },
+                }
                 : // Remove timeRange filter for 'all'
-                  Object.fromEntries(
-                      Object.entries(prev.filters || {}).filter(
-                          ([key]) => key !== 'timeRange',
-                      ),
-                  ),
+                Object.fromEntries(
+                    Object.entries(prev.filters || {}).filter(
+                        ([key]) => key !== 'timeRange',
+                    ),
+                ),
         }));
     };
 
@@ -175,13 +175,6 @@ export function TraceContextProvider({
         refetchInterval: pollingEnabled ? pollingInterval : false,
         refetchIntervalInBackground: true,
     });
-
-    const setTableRequestParams = (
-        updateFn: (params: TableRequestParams) => TableRequestParams,
-    ) => {
-        setTableRequestParamsState((prev) => updateFn(prev));
-        refetch();
-    };
 
     // Fetch statistics with polling
     const { data: statistics, refetch: refetchStatistics } =

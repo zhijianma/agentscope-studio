@@ -63,22 +63,6 @@ export function EvaluationListContextProvider({
         }
     }, [error]);
 
-    /**
-     * Update query params and reset polling timer
-     *
-     * @param updateFn - function to update the table request params
-     */
-    const handleUpdateTableRequestParams = (
-        updateFn: (params: TableRequestParams) => TableRequestParams,
-    ) => {
-        // update the table request params state and reset the polling timer
-        setTableRequestParams((prevParams) => {
-            return updateFn(prevParams);
-        });
-        // Reset polling by calling refetch
-        refetch();
-    };
-
     const deleteEvaluations = async (evaluationIds: string[]) => {
         try {
             const res = await trpcClient.deleteEvaluations.mutate({
@@ -121,7 +105,7 @@ export function EvaluationListContextProvider({
                 tableLoading: isLoading,
                 total: response?.data?.total || 0,
                 tableRequestParams,
-                setTableRequestParams: handleUpdateTableRequestParams,
+                setTableRequestParams,
                 deleteEvaluations,
                 importEvaluation,
             }}
