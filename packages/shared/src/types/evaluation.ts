@@ -72,8 +72,8 @@ interface EvalRepeatResult {
     incomplete_tasks: number;
     metrics: {
         [metricName: string]:
-            | EvalNumericalMetricResult
-            | EvalCategoricalMetricResult;
+        | EvalNumericalMetricResult
+        | EvalCategoricalMetricResult;
     };
     completed_ids: string[];
     incomplete_ids: string[];
@@ -129,6 +129,7 @@ export interface EvalTask {
             };
         };
     };
+    total_repeats?: number;
 }
 
 export interface EvalMetricResult {

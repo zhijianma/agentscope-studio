@@ -247,10 +247,10 @@ const ToolStep = memo(
                                 {typeof toolResultBlock.output === 'string'
                                     ? toolResultBlock.output
                                     : JSON.stringify(
-                                          toolResultBlock.output,
-                                          null,
-                                          2,
-                                      )}
+                                        toolResultBlock.output,
+                                        null,
+                                        2,
+                                    )}
                             </pre>
                         </div>
                     )}
@@ -324,6 +324,23 @@ const TaskPage = () => {
         navigate(`/eval/${evalId}`);
     };
 
+    // Calculate progress from task.repeats and total_repeats
+    const totalRepeats = task.total_repeats || Object.keys(task.repeats).length;
+    const completedRepeats = Object.values(task.repeats).filter(
+        (repeat) => repeat.solution !== undefined,
+    ).length;
+    const progress =
+        totalRepeats > 0
+            ? Math.round((completedRepeats / totalRepeats) * 100)
+            : 0;
+
+    const getStatus = () => {
+        if (completedRepeats === totalRepeats) {
+            return t('table.column.finished');
+        }
+        return t('table.column.incomplete');
+    };
+
     return (
         <div className="flex-1 h-full overflow-y-auto">
             <div className="max-w-5xl mx-auto px-6 py-6 h-full">
@@ -352,9 +369,14 @@ const TaskPage = () => {
                                 </h3>
                                 <SettingsIcon className="size-4 text-muted-foreground" />
                             </div>
-                            <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
-                                <div>{t('status.unknown')}</div>
-                                <div>{t('table.column.progress')}: 12%</div>
+                            <div className="p-6 min-h-[5.5rem] pt-2 space-y-2">
+                                <div className="text-2xl font-bold">
+                                    {getStatus()}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    {t('table.column.progress')}: {progress}% (
+                                    {completedRepeats}/{totalRepeats})
+                                </div>
                             </div>
                         </div>
                     </div>
