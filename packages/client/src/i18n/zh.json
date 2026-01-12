@@ -198,6 +198,7 @@
     },
     "table": {
         "column": {
+            "evaluationName": "评测名称",
             "benchmark": "基准",
             "benchmarkName": "Benchmark",
             "createdAt": "创建时间",
@@ -220,7 +221,8 @@
             "time": "用时",
             "total": "总计",
             "totalRepeats": "重复次数",
-            "totalTokens": "Token 量"
+            "totalTokens": "Token 量",
+            "project": "项目"
         },
         "pagination": {
             "total": "共 {{total}} 项"

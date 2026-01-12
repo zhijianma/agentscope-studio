@@ -204,7 +204,7 @@ const AsTable = <T extends object>({
     return (
         <div className="flex flex-col gap-4 w-full max-w-full">
             <div className="flex flex-row gap-2 items-center">
-                <InputGroup className="max-w-96 h-8">
+                <InputGroup className="max-w-96">
                     <InputGroupInput
                         placeholder={t('placeholder.search-evaluation-task')}
                         value={searchText}
@@ -227,7 +227,9 @@ const AsTable = <T extends object>({
                                     variant="ghost"
                                     className="!pr-1.5 text-xs"
                                 >
-                                    {t('action.search')}{' '}
+                                    {searchField
+                                        ? t(`table.column.${searchField}`)
+                                        : t('action.search')}{' '}
                                     <ChevronDownIcon className="size-3" />
                                 </InputGroupButton>
                             </DropdownMenuTrigger>

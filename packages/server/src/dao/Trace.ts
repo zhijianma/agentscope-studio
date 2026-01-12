@@ -6,9 +6,11 @@ import {
     SpanLink,
     SpanResource,
     SpanScope,
+    Trace,
 } from '../../../shared/src/types/trace';
 import {
     ModelInvocationData,
+    TableData,
     TableRequestParams,
 } from '../../../shared/src/types/trpc';
 import { getNestedValue } from '../../../shared/src/utils/objectUtils';
@@ -421,29 +423,16 @@ export class SpanDao {
      * Get unique trace IDs with aggregated information
      * Uses the same parameter pattern as RunDao.getProjects (TableRequestParams)
      *
-     * @param params - TableRequestParams
-
+     * @param params - TableRequestParams containing pagination, sort, and filters
+     * @returns TableData<Trace> with list, total, page, pageSize
      */
-    static async getTraces(params: TableRequestParams): Promise<{
-        traces: Array<{
-            traceId: string;
-            spanId: string;
-            name: string;
-            startTime: string;
-            endTime: string;
-            duration: number; // in seconds
-            status: number;
-            spanCount: number;
-            totalTokens?: number;
-            isOrphan: boolean;
-        }>;
-        total: number;
-    }> {
+    static async getTraces(
+        params: TableRequestParams,
+    ): Promise<TableData<Trace>> {
         try {
             const { pagination, sort, filters } = params;
 
-            // Select root spans, or orphan spans
-            // Use recursive CTE to count only current span and its descendants
+            // Build subqueries for aggregated fields
             const spanCountSubquery = `(
                 WITH RECURSIVE descendants AS (
                     SELECT spanId FROM span_table WHERE spanId = span.spanId
@@ -464,13 +453,13 @@ export class SpanDao {
                 SELECT SUM(COALESCE(totalTokens, 0)) FROM descendants
             )`;
 
-            // Subquery to check if a span is orphan
             const isOrphanSubquery = `(
                 span.parentSpanId IS NOT NULL
                 AND span.parentSpanId != ''
                 AND span.parentSpanId NOT IN (SELECT p.spanId FROM span_table p WHERE p.traceId = span.traceId)
             )`;
 
+            // Build base query
             const queryBuilder = SpanTable.createQueryBuilder('span')
                 .select('span.traceId', 'traceId')
                 .addSelect('span.spanId', 'spanId')
@@ -497,48 +486,60 @@ export class SpanDao {
                 );
 
             // Apply name filter
-            if (filters?.name?.operator === 'contains' && filters.name.value) {
-                queryBuilder.andWhere('span.name LIKE :nameFilter', {
-                    nameFilter: `%${filters.name.value}%`,
-                });
-            }
+            if (filters?.name) {
+                const filterValue =
+                    typeof filters.name === 'object' &&
+                    filters.name !== null &&
+                    'value' in filters.name
+                        ? (filters.name as { value: string }).value
+                        : String(filters.name);
 
-            // Apply time range filter (timeRange with BETWEEN operator)
-            const timeRangeFilter = filters?.timeRange;
-            if (
-                timeRangeFilter?.operator === 'between' &&
-                Array.isArray(timeRangeFilter.value) &&
-                timeRangeFilter.value.length === 2
-            ) {
-                const [rangeStart, rangeEnd] = timeRangeFilter.value;
-                // Handle cases where only one time point is provided
-                if (rangeStart && rangeEnd) {
-                    queryBuilder.andWhere(
-                        'span.startTimeUnixNano >= :rangeStart AND span.startTimeUnixNano <= :rangeEnd',
-                        { rangeStart, rangeEnd },
-                    );
-                } else if (rangeStart) {
-                    queryBuilder.andWhere(
-                        'span.startTimeUnixNano >= :rangeStart',
-                        { rangeStart },
-                    );
-                } else if (rangeEnd) {
-                    queryBuilder.andWhere(
-                        'span.startTimeUnixNano <= :rangeEnd',
-                        { rangeEnd },
-                    );
+                if (filterValue) {
+                    queryBuilder.andWhere('span.name LIKE :nameFilter', {
+                        nameFilter: `%${filterValue}%`,
+                    });
                 }
             }
 
-            // Get total count (after filter, before pagination)
+            // Apply time range filter
+            if (filters?.timeRange) {
+                const timeRangeFilter = filters.timeRange as {
+                    operator?: string;
+                    value?: (string | null)[];
+                };
+                if (
+                    timeRangeFilter.operator === 'between' &&
+                    Array.isArray(timeRangeFilter.value) &&
+                    timeRangeFilter.value.length === 2
+                ) {
+                    const [rangeStart, rangeEnd] = timeRangeFilter.value;
+                    if (rangeStart && rangeEnd) {
+                        queryBuilder.andWhere(
+                            'span.startTimeUnixNano >= :rangeStart AND span.startTimeUnixNano <= :rangeEnd',
+                            { rangeStart, rangeEnd },
+                        );
+                    } else if (rangeStart) {
+                        queryBuilder.andWhere(
+                            'span.startTimeUnixNano >= :rangeStart',
+                            { rangeStart },
+                        );
+                    } else if (rangeEnd) {
+                        queryBuilder.andWhere(
+                            'span.startTimeUnixNano <= :rangeEnd',
+                            { rangeEnd },
+                        );
+                    }
+                }
+            }
+
+            // Get total count (before pagination)
             const countQuery = queryBuilder.clone();
             const total = await countQuery.getCount();
 
             // Apply sorting
             const sortField = sort?.field || 'startTime';
-            const sortOrder = (sort?.order?.toUpperCase() || 'DESC') as
-                | 'ASC'
-                | 'DESC';
+            const sortOrder =
+                sort?.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
             switch (sortField) {
                 case 'startTime':
@@ -564,25 +565,14 @@ export class SpanDao {
             }
 
             // Apply pagination
-            const offset = (pagination.page - 1) * pagination.pageSize;
-            queryBuilder.limit(pagination.pageSize).offset(offset);
+            const skip = (pagination.page - 1) * pagination.pageSize;
+            queryBuilder.limit(pagination.pageSize).offset(skip);
 
+            // Execute query
             const results = await queryBuilder.getRawMany();
 
-            // Map results to trace objects
-            interface TraceListRow {
-                traceId: string;
-                spanId: string;
-                name: string;
-                startTime: string;
-                endTime: string;
-                status: number | string;
-                spanCount: number | string;
-                totalTokens: number | string | null;
-                isOrphan: number | boolean;
-            }
-
-            const traces = results.map((row: TraceListRow) => {
+            // Map results to Trace type
+            const list = results.map((row) => {
                 const startTimeNs = BigInt(row.startTime || '0');
                 const endTimeNs = BigInt(row.endTime || '0');
                 const duration = Number(endTimeNs - startTimeNs) / 1e9;
@@ -603,14 +593,16 @@ export class SpanDao {
                             : undefined,
                     isOrphan: Boolean(row.isOrphan),
                 };
-            });
+            }) as Trace[];
 
-            console.debug(
-                `[TraceDao] getTraces: returning ${traces.length} traces`,
-            );
-            return { traces, total };
+            return {
+                list,
+                total,
+                page: pagination.page,
+                pageSize: pagination.pageSize,
+            };
         } catch (error) {
-            console.error('Error getting trace list:', error);
+            console.error('Error in getTraces:', error);
             throw error;
         }
     }

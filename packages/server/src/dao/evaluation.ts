@@ -1,7 +1,7 @@
 import { EvaluationTable } from '@/models/evaluation';
 import { FindOptionsWhere, In, Like } from 'typeorm';
+import { TableData, TableRequestParams } from '../../../shared/src';
 import { Evaluation } from '../../../shared/src/types/evaluation';
-import { TableRequestParams, TableData } from '../../../shared/src';
 
 export class EvaluationDao {
     static async saveEvaluation(data: Evaluation) {
@@ -29,15 +29,38 @@ export class EvaluationDao {
         try {
             const { pagination, sort, filters } = params;
 
+            // Helper to extract filter value from structured format or plain string
+            const getFilterValue = (filter: unknown): string | undefined => {
+                if (!filter) return undefined;
+                if (
+                    typeof filter === 'object' &&
+                    filter !== null &&
+                    'value' in filter
+                ) {
+                    return (filter as { value: string }).value;
+                }
+                if (typeof filter === 'string') {
+                    return filter;
+                }
+                return undefined;
+            };
+
             // Build find options with filters
             const where: FindOptionsWhere<EvaluationTable> = {};
 
             if (filters) {
-                if (filters.evaluationName) {
-                    where.evaluationName = Like(`%${filters.evaluationName}%`);
+                const evaluationNameValue = getFilterValue(
+                    filters.evaluationName,
+                );
+                if (evaluationNameValue) {
+                    where.evaluationName = Like(`%${evaluationNameValue}%`);
                 }
-                if (filters.benchmarkName) {
-                    where.benchmarkName = Like(`%${filters.benchmarkName}%`);
+
+                const benchmarkNameValue = getFilterValue(
+                    filters.benchmarkName,
+                );
+                if (benchmarkNameValue) {
+                    where.benchmarkName = Like(`%${benchmarkNameValue}%`);
                 }
             }
 

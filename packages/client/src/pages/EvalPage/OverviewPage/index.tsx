@@ -5,7 +5,6 @@ import PageTitleSpan from '@/components/spans/PageTitleSpan.tsx';
 import AsTable from '@/components/tables/AsTable';
 import { NumberCell, TextCell } from '@/components/tables/utils.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
 import { useEvaluationList } from '@/context/EvaluationListContext.tsx';
 import { useMessageApi } from '@/context/MessageApiContext.tsx';
 import { EmptyPage } from '@/pages/DefaultPage';
@@ -27,7 +26,6 @@ const OverviewPage = () => {
     } = useEvaluationList();
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const { t } = useTranslation();
-    const [searchText, setSearchText] = useState<string>('');
     const navigate = useNavigate();
     const [open, setOpen] = useState<boolean>(false);
     const [importDir, setImportDir] = useState<string | null>(null);
@@ -97,33 +95,6 @@ const OverviewPage = () => {
         },
     ];
 
-    const handlePaginationChange = (
-        page: number,
-        pageSize: number,
-        sortField: string | undefined,
-        sortOrder: 'asc' | 'desc' | undefined,
-    ) => {
-        setTableRequestParams((prevParams) => {
-            const newParams = {
-                ...prevParams,
-                pagination: {
-                    page,
-                    pageSize,
-                },
-            };
-            if (sortField && sortOrder) {
-                return {
-                    ...newParams,
-                    sort: {
-                        field: sortField,
-                        order: sortOrder,
-                    },
-                };
-            }
-            return newParams;
-        });
-    };
-
     const handleImport = useCallback(async () => {
         if (importDir === null) {
             messageApi.error('Please select a directory first');
@@ -169,92 +140,56 @@ const OverviewPage = () => {
                 description={t('description.eval.title')}
             />
 
-            <div className="flex flex-col flex-1 space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2">
-                    <Input
-                        className="w-full sm:max-w-[300px]"
-                        value={searchText}
-                        onChange={(event) => {
-                            setSearchText(event.target.value);
-                        }}
-                        placeholder={t('placeholder.search-evaluation')}
-                    />
-
-                    <Button
-                        disabled={selectedRowKeys.length === 0}
-                        variant="outline"
-                        onClick={() =>
-                            handleDelete(selectedRowKeys as string[])
-                        }
-                    >
-                        <Trash2Icon className="size-3.5" />
-                        {t('action.delete')}
-                    </Button>
-
-                    <Button variant="default" onClick={() => setOpen(true)}>
-                        {/*<PlusIcon className="size-3.5"/>*/}
-                        {t('action.import-evaluation')}
-                    </Button>
-                </div>
-
-                <div className="flex-1">
-                    <AsTable<Evaluation>
-                        locale={{
-                            emptyText: (
-                                <EmptyPage
-                                    size={100}
-                                    title="No evaluation histories"
-                                />
-                            ),
-                        }}
-                        loading={tableLoading}
-                        dataSource={tableDataSource}
-                        onChange={(pagination, _filters, sorter) => {
-                            const page = pagination.current || 1;
-                            const pageSize = pagination.pageSize || 50;
-
-                            // Handle sorter - it can be an array or a single object
-                            const actualSorter = Array.isArray(sorter)
-                                ? sorter[0]
-                                : sorter;
-                            const sortField = actualSorter?.field as
-                                | string
-                                | undefined;
-                            const sortOrder = actualSorter?.order
-                                ? actualSorter.order === 'ascend'
-                                    ? 'asc'
-                                    : 'desc'
-                                : undefined;
-
-                            handlePaginationChange(
-                                page,
-                                pageSize,
-                                sortField,
-                                sortOrder,
-                            );
-                        }}
-                        onRow={(evaluation: Evaluation) => {
-                            return {
-                                onClick: (event: MouseEvent) => {
-                                    if (event.type === 'click') {
-                                        navigate(`/eval/${evaluation.id}`);
-                                    }
-                                },
-                                style: {
-                                    cursor: 'pointer',
-                                },
-                            };
-                        }}
-                        columns={columns}
-                        showSorterTooltip={{ target: 'full-header' }}
-                        rowKey="id"
-                        total={total}
-                        tableRequestParams={tableRequestParams}
-                        setTableRequestParams={setTableRequestParams}
-                        selectedRowKeys={selectedRowKeys}
-                        setSelectedRowKeys={setSelectedRowKeys}
-                    />
-                </div>
+            <div className="flex-1 min-h-0 w-full">
+                <AsTable<Evaluation>
+                    locale={{
+                        emptyText: (
+                            <EmptyPage
+                                size={100}
+                                title="No evaluation histories"
+                            />
+                        ),
+                    }}
+                    loading={tableLoading}
+                    dataSource={tableDataSource}
+                    onRow={(evaluation: Evaluation) => ({
+                        onClick: (event: MouseEvent) => {
+                            if (event.type === 'click') {
+                                navigate(`/eval/${evaluation.id}`);
+                            }
+                        },
+                        className: 'cursor-pointer',
+                    })}
+                    columns={columns}
+                    showSorterTooltip={{ target: 'full-header' }}
+                    rowKey="id"
+                    total={total}
+                    tableRequestParams={tableRequestParams}
+                    setTableRequestParams={setTableRequestParams}
+                    selectedRowKeys={selectedRowKeys}
+                    setSelectedRowKeys={setSelectedRowKeys}
+                    searchableColumns={['evaluationName', 'benchmarkName']}
+                    actions={
+                        <>
+                            <Button
+                                disabled={selectedRowKeys.length === 0}
+                                variant="outline"
+                                onClick={() =>
+                                    handleDelete(selectedRowKeys as string[])
+                                }
+                            >
+                                <Trash2Icon className="size-3.5" />
+                                {t('action.delete')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setOpen(true)}
+                            >
+                                {t('action.import-evaluation')}
+                            </Button>
+                        </>
+                    }
+                />
             </div>
         </div>
     );

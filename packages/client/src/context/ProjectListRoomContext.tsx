@@ -1,15 +1,15 @@
 import {
     createContext,
-    useContext,
     ReactNode,
-    useState,
+    useContext,
     useEffect,
+    useState,
 } from 'react';
 
-import { ProjectData, SocketEvents, TableRequestParams } from '@shared/types';
 import { trpc } from '@/api/trpc';
-import { useSocket } from './SocketContext';
+import { ProjectData, SocketEvents, TableRequestParams } from '@shared/types';
 import { useMessageApi } from './MessageApiContext.tsx';
+import { useSocket } from './SocketContext';
 
 interface ProjectListRoomContextType {
     // table related parameters

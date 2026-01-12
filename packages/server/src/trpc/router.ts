@@ -21,10 +21,10 @@ import {
     ResponseBody,
     RunData,
     Status,
-    // RunData,
     TableData,
     TableRequestParams,
     TableRequestParamsSchema,
+    Trace,
 } from '../../../shared/src';
 import { FridayConfigManager } from '../../../shared/src/config/friday';
 import { EvalResult, Evaluation } from '../../../shared/src/types/evaluation';
@@ -385,26 +385,22 @@ export const appRouter = t.router({
         .input(TableRequestParamsSchema)
         .query(async ({ input }) => {
             try {
-                const result = await RunDao.getProjects(
-                    input.pagination,
-                    input.sort,
-                    input.filters,
-                );
-
+                console.debug('[TRPC] getProjects called with input:', input);
+                const result = await RunDao.getProjects(input);
                 return {
                     success: true,
                     message: 'Projects fetched successfully',
                     data: result,
                 } as ResponseBody<TableData<ProjectData>>;
             } catch (error) {
-                console.error('Error fetching projects:', error);
-                return {
-                    success: false,
+                console.error('Error in getProjects:', error);
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
                     message:
                         error instanceof Error
                             ? error.message
-                            : 'Unknown error',
-                } as ResponseBody<TableData<ProjectData>>;
+                            : 'Failed to get projects',
+                });
             }
         }),
 
@@ -414,7 +410,11 @@ export const appRouter = t.router({
             try {
                 console.debug('[TRPC] getTraces called with input:', input);
                 const result = await SpanDao.getTraces(input);
-                return result;
+                return {
+                    success: true,
+                    message: 'Traces fetched successfully',
+                    data: result,
+                } as ResponseBody<TableData<Trace>>;
             } catch (error) {
                 console.error('Error in getTraces:', error);
                 throw new TRPCError({

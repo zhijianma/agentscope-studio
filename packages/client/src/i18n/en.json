@@ -206,6 +206,7 @@
     },
     "table": {
         "column": {
+            "evaluationName": "Evaluation Name",
             "benchmark": "Benchmark",
             "benchmarkName": "Benchmark",
             "createdAt": "Created At",
@@ -228,7 +229,8 @@
             "totalRepeats": "Total Repeats",
             "totalTokens": "Tokens",
             "duration": "Duration",
-            "startTime": "Start Time"
+            "startTime": "Start Time",
+            "project": "Project"
         },
         "pagination": {
             "total": "{{total}} items in total"

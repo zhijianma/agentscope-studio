@@ -87,8 +87,8 @@ export interface SpanData {
     latencyNs: number;
 }
 
-// Trace list item interface for UI display
-export interface TraceListItem {
+// Trace interface for list display
+export interface Trace {
     traceId: string;
     spanId: string; // Unique identifier for each row (root or orphan span)
     name: string;

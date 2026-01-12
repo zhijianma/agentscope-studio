@@ -1,7 +1,7 @@
 import {
     RangeFilterOperator,
     TableRequestParams,
-    TraceListItem,
+    Trace,
     TraceStatistics,
 } from '@shared/types';
 import dayjs from 'dayjs';
@@ -20,7 +20,7 @@ export interface TraceContextType {
     ) => void;
 
     // Data
-    traces: TraceListItem[];
+    traces: Trace[];
     statistics: TraceStatistics | undefined;
     traceData:
         | {
@@ -163,7 +163,7 @@ export function TraceContextProvider({
     }, [timeRange]);
 
     const {
-        data: traceListData,
+        data: response,
         isLoading,
         error,
         refetch,
@@ -213,7 +213,7 @@ export function TraceContextProvider({
     );
 
     // Use traces directly from API (no client-side filtering needed)
-    const traces = traceListData?.traces || [];
+    const traces = response?.data?.list || [];
 
     const value: TraceContextType = useMemo(
         () => ({
@@ -232,7 +232,7 @@ export function TraceContextProvider({
             isLoading,
             isLoadingTrace,
             error: error as Error | null,
-            total: traceListData?.total || 0,
+            total: response?.data?.total || 0,
 
             // Selected trace
             selectedTraceId,
@@ -258,7 +258,7 @@ export function TraceContextProvider({
             isLoading,
             isLoadingTrace,
             error,
-            traceListData?.total,
+            response?.data?.total || 0,
             selectedTraceId,
             selectedRootSpanId,
             drawerOpen,

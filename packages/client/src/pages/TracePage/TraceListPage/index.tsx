@@ -23,7 +23,7 @@ import {
     formatDurationWithUnit,
     formatNumber,
 } from '@/utils/common';
-import { TraceListItem } from '@shared/types';
+import { Trace } from '@shared/types';
 import TraceDetailPage from '../TraceDetailPage';
 
 // Helper component for statistic cards
@@ -149,7 +149,7 @@ const TraceListPage = () => {
         }
     };
 
-    const columns: TableColumnsType<TraceListItem> = useMemo(
+    const columns: TableColumnsType<Trace> = useMemo(
         () => [
             {
                 key: 'name',
@@ -297,15 +297,14 @@ const TraceListPage = () => {
 
             {/* Table */}
             <div className="flex-1 min-h-0 w-full">
-                <AsTable<TraceListItem>
+                <AsTable<Trace>
                     columns={columns}
                     dataSource={traces}
                     loading={isLoading}
                     rowKey="spanId"
-                    onRow={(record: TraceListItem) => ({
+                    onRow={(record: Trace) => ({
                         onClick: () => {
                             setSelectedTraceId(record.traceId);
-                            // For orphan spans, set the rootSpanId to only show this span and descendants
                             setSelectedRootSpanId(
                                 record.isOrphan ? record.spanId : null,
                             );
