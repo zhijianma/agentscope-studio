@@ -10,11 +10,11 @@ import {
 } from 'react';
 import { useParams } from 'react-router-dom';
 
-interface EvaluationTaskContext {
+interface EvaluationTaskContextType {
     task: EvalTask;
 }
 
-const EvaluationTaskContext = createContext<EvaluationTaskContext | null>(null);
+const EvaluationTaskContext = createContext<EvaluationTaskContextType | null>(null);
 
 interface Props {
     children: ReactNode;
