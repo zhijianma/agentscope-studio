@@ -81,6 +81,7 @@
         "prompt": "提示词",
         "prompt-average": "提示词(Avg)",
         "repeat": "重复次数",
+        "result": "结果",
         "run": "运行",
         "runs": "运行",
         "run-name": "名称",
@@ -107,7 +108,9 @@
         "start-time": "开始时间",
         "end-time": "结束时间",
         "statistics": "统计",
-        "status": "状态"
+        "status": "状态",
+        "stats": "统计",
+        "step": "步骤"
     },
     "default-page": {
         "no-data-available": "暂无数据"
@@ -270,7 +273,9 @@
             "render-markdown": "渲染为 Markdown 格式",
             "send-message": "发送消息",
             "send-message-disable": "当前输入请求为空",
-            "scroll-to-bottom": "滚动到最底部"
+            "scroll-to-bottom": "滚动到最底部",
+            "click-to-view-result": "点击查看结果",
+            "no-result-available": "暂无结果"
         },
         "chart": {
             "invocation": "调用次数"

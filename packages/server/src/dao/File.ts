@@ -1,10 +1,5 @@
 import fs from 'fs/promises';
-import {
-    EvalTaskMeta,
-    EvalTask,
-    EvalStats,
-    EvalMetricResult,
-} from '../../../shared/src/types/evaluation';
+import path from 'path';
 import {
     ArrayElementContainsFilterOperator,
     ArrayFilterOperator,
@@ -12,7 +7,12 @@ import {
     TableData,
     TableRequestParams,
 } from '../../../shared/src';
-import path from 'path';
+import {
+    EvalMetricResult,
+    EvalStats,
+    EvalTask,
+    EvalTaskMeta,
+} from '../../../shared/src/types/evaluation';
 
 export class FileDao {
     static async getJSONFile<T>(filePath: string): Promise<T> {
@@ -112,12 +112,12 @@ export class FileDao {
                         case 'input':
                             switch (filterOps.operator) {
                                 case StringFilterOperator.CONTAINS:
-                                    if (task.input.includes(filterOps.value)) {
+                                    if (!task.input.includes(filterOps.value)) {
                                         reserve = false;
                                     }
                                     break;
                                 case StringFilterOperator.NOT_CONTAINS:
-                                    if (!task.input.includes(filterOps.value)) {
+                                    if (task.input.includes(filterOps.value)) {
                                         reserve = false;
                                     }
                                     break;

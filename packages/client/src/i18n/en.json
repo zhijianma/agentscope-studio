@@ -81,6 +81,7 @@
         "prompt": "Prompt",
         "prompt-average": "Prompt(Avg)",
         "repeat": "Repeat",
+        "result": "Result",
         "run": "Run",
         "runs": "Runs",
         "run-name": "Name",
@@ -107,7 +108,9 @@
         "start-time": "Start Time",
         "end-time": "End Time",
         "statistics": "Statistics",
-        "status": "Status"
+        "status": "Status",
+        "stats": "Stats",
+        "step": "Step"
     },
     "default-page": {
         "no-data-available": "No data available"
@@ -278,7 +281,9 @@
             "render-markdown": "Render markdown",
             "send-message": "Send your message",
             "send-message-disable": "No user input is requested",
-            "scroll-to-bottom": "Scroll to the bottom"
+            "scroll-to-bottom": "Scroll to the bottom",
+            "click-to-view-result": "Click to view result",
+            "no-result-available": "No result available"
         },
         "chart": {
             "invocation": "# of invocation"
