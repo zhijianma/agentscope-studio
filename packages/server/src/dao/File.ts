@@ -322,7 +322,7 @@ export class FileDao {
             // Read stats.json, solution.json if exists
             const statsPath = path.join(repeatPath, 'stats.json');
             const statsPathStat = await fs.stat(statsPath);
-            if (!statsPathStat.isFile()) {
+            if (statsPathStat.isFile()) {
                 repeats[repeatDir].stats =
                     await this.getJSONFile<EvalStats>(statsPath);
             }
