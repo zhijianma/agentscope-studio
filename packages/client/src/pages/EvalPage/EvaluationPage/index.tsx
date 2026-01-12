@@ -24,7 +24,14 @@ import {
 import { ModelCard, ToolCard } from '@/pages/EvalPage/EvaluationPage/DataCard';
 import { EvalTaskMeta } from '@shared/types/evaluation.ts';
 import { TableColumnsType } from 'antd';
-import { CirclePlusIcon, SearchIcon } from 'lucide-react';
+import {
+    ActivityIcon,
+    CirclePlusIcon,
+    CpuIcon,
+    DollarSignIcon,
+    SearchIcon,
+    SettingsIcon,
+} from 'lucide-react';
 import { Key, memo, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -291,24 +298,7 @@ const EvaluationPage = () => {
                                 <h3 className="tracking-tight text-sm font-medium">
                                     {t('common.evaluation')}
                                 </h3>
-                                <div className="text-muted-foreground h-4 w-4">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="lucide-icon lucide lucide-settings"
-                                    >
-                                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </div>
+                                <SettingsIcon className="size-4 text-muted-foreground" />
                             </div>
 
                             <div className="p-6 min-h-[5.5rem] pt-2">
@@ -360,22 +350,7 @@ const EvaluationPage = () => {
                             <h3 className="tracking-tight text-sm font-medium">
                                 {t('common.task')}
                             </h3>
-                            <div className="text-muted-foreground h-4 w-4">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="lucide-icon lucide lucide-activity"
-                                >
-                                    <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path>
-                                </svg>
-                            </div>
+                            <ActivityIcon className="size-4 text-muted-foreground" />
                         </div>
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
@@ -411,24 +386,7 @@ const EvaluationPage = () => {
                             <h3 className="tracking-tight text-sm font-medium">
                                 {t('common.metric')}
                             </h3>
-                            <div className="text-muted-foreground h-4 w-4">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="lucide-icon lucide lucide-dollar-sign"
-                                >
-                                    <line x1="12" x2="12" y1="2" y2="22"></line>
-
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                </svg>
-                            </div>
+                            <DollarSignIcon className="size-4 text-muted-foreground" />
                         </div>
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
@@ -453,52 +411,7 @@ const EvaluationPage = () => {
                             <h3 className="tracking-tight text-sm font-medium">
                                 {t('common.token-usage')}
                             </h3>
-                            <div className="text-muted-foreground h-4 w-4">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="lucide-icon lucide lucide-cpu"
-                                >
-                                    <rect
-                                        width="16"
-                                        height="16"
-                                        x="4"
-                                        y="4"
-                                        rx="2"
-                                    ></rect>
-
-                                    <rect
-                                        width="6"
-                                        height="6"
-                                        x="9"
-                                        y="9"
-                                        rx="1"
-                                    ></rect>
-
-                                    <path d="M15 2v2"></path>
-
-                                    <path d="M15 20v2"></path>
-
-                                    <path d="M2 15h2"></path>
-
-                                    <path d="M2 9h2"></path>
-
-                                    <path d="M20 15h2"></path>
-
-                                    <path d="M20 9h2"></path>
-
-                                    <path d="M9 2v2"></path>
-
-                                    <path d="M9 20v2"></path>
-                                </svg>
-                            </div>
+                            <CpuIcon className="size-4 text-muted-foreground" />
                         </div>
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
