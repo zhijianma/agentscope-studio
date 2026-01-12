@@ -547,7 +547,6 @@ export const appRouter = t.router({
 
             try {
                 if (fs.existsSync(input.path)) {
-                    // 获取该目录下所有的文件和文件夹，只获取他们的名字，是否是文件夹，修改时间
                     const fileNames = fs
                         .readdirSync(input.path)
                         .map((fileName) => {
@@ -559,14 +558,14 @@ export const appRouter = t.router({
                                 isDirectory: stats.isDirectory(),
                             };
                         });
-                    console.log('success: ', fileNames);
+                    console.debug('success: ', fileNames);
                     return {
                         success: true,
                         message: 'Directory listed successfully',
                         data: fileNames,
                     };
                 }
-                console.log('Directory not exists: ', input.path);
+                console.error('Directory not exists: ', input.path);
                 return { success: false, message: 'Directory not exists' };
             } catch (error) {
                 console.error(error);

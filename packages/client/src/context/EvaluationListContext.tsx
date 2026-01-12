@@ -1,6 +1,6 @@
 import { trpc, trpcClient } from '@/api/trpc.ts';
 import { useMessageApi } from '@/context/MessageApiContext.tsx';
-import { ResponseBody, TableRequestParams } from '@shared/types';
+import { TableRequestParams } from '@shared/types';
 import { Evaluation } from '@shared/types/evaluation.ts';
 import {
     createContext,
@@ -97,26 +97,19 @@ export function EvaluationListContextProvider({
     };
 
     const importEvaluation = async (evaluationDir: string) => {
-        // Send a POST request to the server
-        const response = await fetch('/trpc/importEvaluation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                evaluationDir: evaluationDir,
-            }),
-        });
-
-        // Handle the response
-        const jsonData = await response.json();
-        const backendResponse: ResponseBody = jsonData.result.data;
-        if (backendResponse.success) {
-            // messageApi.info(backendResponse.message);
-            refetch();
-            return true;
-        } else {
-            messageApi.error(backendResponse.message);
+        try {
+            const result = await trpcClient.importEvaluation.mutate({
+                evaluationDir,
+            });
+            if (result.success) {
+                refetch();
+                return true;
+            } else {
+                messageApi.error(result.message);
+                return false;
+            }
+        } catch (error) {
+            messageApi.error((error as Error).message);
             return false;
         }
     };
