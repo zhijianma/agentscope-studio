@@ -35,7 +35,7 @@ const getInitialPath = () => {
     return '/';
 };
 
-const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
+const LocalFilePicker = ({ onSelect, ...restProps }: Props) => {
     const { t } = useTranslation();
     const [currentPath, setCurrentPath] = useState<string>(getInitialPath());
     const [treeData, setTreeData] = useState<CustomTreeDataNode[]>([]);
@@ -122,7 +122,7 @@ const LocalFilePicker = ({ onSelect, ...resetProps }: Props) => {
     return (
         <div
             className="flex flex-col h-[100%] max-h-[100%] gap-y-2"
-            {...resetProps}
+            {...restProps}
         >
             <Input
                 variant="filled"
