@@ -16,17 +16,64 @@ import {
     TabsTrigger,
 } from '@/components/ui/tabs.tsx';
 import { useEvaluationTaskContext } from '@/context/EvaluationTaskContext';
+import { ModelCard, ToolCard } from '@/pages/EvalPage/EvaluationPage/DataCard';
+import { formatNumber } from '@/utils/common';
 import {
     BlockType,
     TextBlock,
     ToolResultBlock,
     ToolUseBlock,
 } from '@shared/types';
-import { EvalStats, EvalTrajectory } from '@shared/types/evaluation.ts';
-import { ChevronLeftIcon, SettingsIcon } from 'lucide-react';
+import { EvalTrajectory } from '@shared/types/evaluation.ts';
+import { ChevronLeftIcon, CpuIcon, SettingsIcon } from 'lucide-react';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+
+const TokenUsageCard = memo(
+    ({
+        inputTokens,
+        outputTokens,
+    }: {
+        inputTokens: number;
+        outputTokens: number;
+    }) => {
+        const { t } = useTranslation();
+        return (
+            <div className="rounded-xl border shadow">
+                <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-1">
+                    <h3 className="tracking-tight text-sm font-medium">
+                        {t('common.token-usage')}
+                    </h3>
+                    <CpuIcon className="size-4 text-muted-foreground" />
+                </div>
+                <div className="p-6 min-h-[5.5rem] pt-2">
+                    <div className="text-2xl font-bold">
+                        {formatNumber(inputTokens + outputTokens)}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                        <div className="flex flex-col">
+                            <span className="text-muted-foreground text-xs">
+                                {t('common.prompt')}
+                            </span>
+                            <span className="text-sm font-medium">
+                                {formatNumber(inputTokens)}
+                            </span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-muted-foreground text-xs">
+                                {t('common.completion')}
+                            </span>
+                            <span className="text-sm font-medium">
+                                {formatNumber(outputTokens)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    },
+);
 
 const TextStep = memo(
     ({
@@ -59,129 +106,6 @@ const TextStep = memo(
         );
     },
 );
-
-const StatsCard = memo(({ stats }: { stats?: EvalStats }) => {
-    const { t } = useTranslation();
-
-    if (!stats) {
-        return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t('common.stats')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-muted-foreground text-sm">
-                        {t('default-page.no-data-available')}
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    // Calculate total tokens
-    const totalInputTokens = Object.values(stats.chat_usage || {}).reduce(
-        (acc, usage) => acc + (usage.input_tokens || 0),
-        0,
-    );
-    const totalOutputTokens = Object.values(stats.chat_usage || {}).reduce(
-        (acc, usage) => acc + (usage.output_tokens || 0),
-        0,
-    );
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('common.stats')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {/* LLM Stats */}
-                {stats.llm && Object.keys(stats.llm).length > 0 && (
-                    <div>
-                        <div className="text-sm font-medium mb-2">
-                            {t('common.llm')}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(stats.llm).map(([model, count]) => (
-                                <div
-                                    key={model}
-                                    className="flex justify-between text-sm bg-muted/50 rounded px-2 py-1"
-                                >
-                                    <span className="truncate text-muted-foreground">
-                                        {model}
-                                    </span>
-                                    <span className="font-medium">{count}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Tool Stats */}
-                {stats.tool && Object.keys(stats.tool).length > 0 && (
-                    <div>
-                        <div className="text-sm font-medium mb-2">
-                            {t('common.tool')}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            {Object.entries(stats.tool).map(([tool, count]) => (
-                                <div
-                                    key={tool}
-                                    className="flex justify-between text-sm bg-muted/50 rounded px-2 py-1"
-                                >
-                                    <span className="truncate text-muted-foreground">
-                                        {tool}
-                                    </span>
-                                    <span className="font-medium">{count}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Token Usage */}
-                {stats.chat_usage &&
-                    Object.keys(stats.chat_usage).length > 0 && (
-                        <div>
-                            <div className="text-sm font-medium mb-2">
-                                {t('common.token-usage')}
-                            </div>
-                            <div className="space-y-2">
-                                {Object.entries(stats.chat_usage).map(
-                                    ([model, usage]) => (
-                                        <div
-                                            key={model}
-                                            className="text-sm bg-muted/50 rounded px-2 py-1"
-                                        >
-                                            <div className="font-medium truncate mb-1">
-                                                {model}
-                                            </div>
-                                            <div className="flex justify-between text-muted-foreground">
-                                                <span>
-                                                    {t('common.input')}:{' '}
-                                                    {usage.input_tokens}
-                                                </span>
-                                                <span>
-                                                    {t('common.output')}:{' '}
-                                                    {usage.output_tokens}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ),
-                                )}
-                                <div className="flex justify-between text-sm font-medium pt-1 border-t">
-                                    <span>{t('common.total')}</span>
-                                    <span>
-                                        {totalInputTokens} + {totalOutputTokens}{' '}
-                                        = {totalInputTokens + totalOutputTokens}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-            </CardContent>
-        </Card>
-    );
-});
 
 const ToolStep = memo(
     ({
@@ -247,10 +171,10 @@ const ToolStep = memo(
                                 {typeof toolResultBlock.output === 'string'
                                     ? toolResultBlock.output
                                     : JSON.stringify(
-                                        toolResultBlock.output,
-                                        null,
-                                        2,
-                                    )}
+                                          toolResultBlock.output,
+                                          null,
+                                          2,
+                                      )}
                             </pre>
                         </div>
                     )}
@@ -341,11 +265,38 @@ const TaskPage = () => {
         return t('table.column.incomplete');
     };
 
+    // Aggregate stats from all repeats for overview
+    const aggregatedLlm: Record<string, number> = {};
+    const aggregatedTool: Record<string, number> = {};
+    let aggregatedInputTokens = 0;
+    let aggregatedOutputTokens = 0;
+
+    Object.values(task.repeats).forEach((repeatData) => {
+        const stats = repeatData.stats;
+        if (!stats) return;
+
+        // Aggregate LLM
+        Object.entries(stats.llm || {}).forEach(([model, count]) => {
+            aggregatedLlm[model] = (aggregatedLlm[model] || 0) + count;
+        });
+
+        // Aggregate Tool
+        Object.entries(stats.tool || {}).forEach(([tool, count]) => {
+            aggregatedTool[tool] = (aggregatedTool[tool] || 0) + count;
+        });
+
+        // Aggregate Tokens
+        Object.values(stats.chat_usage || {}).forEach((usage) => {
+            aggregatedInputTokens += usage.input_tokens || 0;
+            aggregatedOutputTokens += usage.output_tokens || 0;
+        });
+    });
+
     return (
         <div className="flex-1 h-full overflow-y-auto">
-            <div className="max-w-5xl mx-auto px-6 py-6 h-full">
+            <div className="max-w-5xl mx-auto px-6 py-6 space-y-6 h-full">
                 <div
-                    className="text-muted-foreground mb-2 flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+                    className="text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
                     onClick={handleBackToEvaluation}
                 >
                     <ChevronLeftIcon className="size-4" />
@@ -355,100 +306,122 @@ const TaskPage = () => {
                     <div className="truncate font-bold text-xl">
                         {t('common.task')} {task.meta.id}
                     </div>
-                    <div className="truncate text-sm text-muted-foreground mb-3">
+                    <div className="truncate text-sm text-muted-foreground">
                         {t('common.evaluation')}: {task.meta.id}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="col-span-1">
-                        <div className="rounded-xl border shadow">
-                            <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-1">
-                                <h3 className="tracking-tight text-sm font-medium">
-                                    {t('common.status')}
-                                </h3>
-                                <SettingsIcon className="size-4 text-muted-foreground" />
-                            </div>
-                            <div className="p-6 min-h-[5.5rem] pt-2 space-y-2">
-                                <div className="text-2xl font-bold">
-                                    {getStatus()}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                    {t('table.column.progress')}: {progress}% (
-                                    {completedRepeats}/{totalRepeats})
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-span-full rounded-xl border shadow">
-                        <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
+                {/* Status Card */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="rounded-xl border shadow">
+                        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-1">
                             <h3 className="tracking-tight text-sm font-medium">
-                                {t('common.input')}
+                                {t('common.status')}
                             </h3>
+                            <SettingsIcon className="size-4 text-muted-foreground" />
                         </div>
-                        <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
-                            {task.meta.input}
+                        <div className="p-6 min-h-[5.5rem] pt-2 space-y-2">
+                            <div className="text-2xl font-bold">
+                                {getStatus()}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                                {t('table.column.progress')}: {progress}% (
+                                {completedRepeats}/{totalRepeats})
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="col-span-full rounded-xl border shadow">
-                        <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
-                            <h3 className="tracking-tight text-sm font-medium">
-                                {t('table.column.ground-truth')}
-                            </h3>
-                        </div>
-                        <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
-                            {JSON.stringify(task.meta.ground_truth, null, 2)}
-                        </div>
+                {/* Input Card */}
+                <div className="rounded-xl border shadow">
+                    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
+                        <h3 className="tracking-tight text-sm font-medium">
+                            {t('common.input')}
+                        </h3>
                     </div>
+                    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
+                        {task.meta.input}
+                    </div>
+                </div>
 
-                    {/*<Segmented*/}
-                    {/*    className="col-span-full"*/}
-                    {/*    options={[*/}
-                    {/*        'overview',*/}
-                    {/*        ...Object.keys(task.repeats).map(*/}
-                    {/*            (repeatId) => `repeatId: ${repeatId}`,*/}
-                    {/*        ),*/}
-                    {/*    ]}*/}
-                    {/*/>*/}
+                {/* Ground Truth Card */}
+                <div className="rounded-xl border shadow">
+                    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
+                        <h3 className="tracking-tight text-sm font-medium">
+                            {t('table.column.ground-truth')}
+                        </h3>
+                    </div>
+                    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
+                        {JSON.stringify(task.meta.ground_truth, null, 2)}
+                    </div>
+                </div>
 
-                    {/*<div className="col-span-full rounded-xl border shadow">*/}
-                    {/*    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">*/}
-                    {/*        <h3 className="tracking-tight text-sm font-medium">*/}
-                    {/*            Output*/}
-                    {/*        </h3>*/}
-                    {/*    </div>*/}
-                    {/*    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4"></div>*/}
-                    {/*</div>*/}
-
-                    {/*<div className="col-span-full rounded-xl border shadow">*/}
-                    {/*    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">*/}
-                    {/*        <h3 className="tracking-tight text-sm font-medium">*/}
-                    {/*            Trajectory*/}
-                    {/*        </h3>*/}
-                    {/*    </div>*/}
-                    {/*    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4"></div>*/}
-                    {/*</div>*/}
-
-                    <Tabs defaultValue="0" className="col-span-full">
-                        <TabsList>
-                            <TabsTrigger value="overview">
-                                {t('common.overview')}
+                {/* Tabs with Overview and Repeats */}
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList>
+                        <TabsTrigger value="overview">
+                            {t('common.overview')}
+                        </TabsTrigger>
+                        {Object.keys(task.repeats).map((repeatId) => (
+                            <TabsTrigger key={repeatId} value={repeatId}>
+                                {`repeat ${repeatId}`}
                             </TabsTrigger>
-                            {Object.keys(task.repeats).map((repeatId) => (
-                                <TabsTrigger key={repeatId} value={repeatId}>
-                                    {`repeat ${repeatId}`}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                        {Object.entries(task.repeats).map(
-                            ([repeatId, repeatData]) => (
+                        ))}
+                    </TabsList>
+
+                    {/* Overview Tab - Aggregated data */}
+                    <TabsContent
+                        value="overview"
+                        className="flex flex-col gap-4"
+                    >
+                        {/* LLM and Tool Stats Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <ModelCard models={aggregatedLlm} />
+                            <ToolCard tools={aggregatedTool} />
+                        </div>
+
+                        {/* Token Usage Card */}
+                        <TokenUsageCard
+                            inputTokens={aggregatedInputTokens}
+                            outputTokens={aggregatedOutputTokens}
+                        />
+                    </TabsContent>
+
+                    {Object.entries(task.repeats).map(
+                        ([repeatId, repeatData]) => {
+                            const stats = repeatData.stats;
+                            const repeatInputTokens = stats
+                                ? Object.values(stats.chat_usage || {}).reduce(
+                                      (acc, usage) =>
+                                          acc + (usage.input_tokens || 0),
+                                      0,
+                                  )
+                                : 0;
+                            const repeatOutputTokens = stats
+                                ? Object.values(stats.chat_usage || {}).reduce(
+                                      (acc, usage) =>
+                                          acc + (usage.output_tokens || 0),
+                                      0,
+                                  )
+                                : 0;
+
+                            return (
                                 <TabsContent
                                     key={repeatId}
                                     value={repeatId}
                                     className="flex flex-col gap-4"
                                 >
-                                    <StatsCard stats={repeatData.stats} />
+                                    {/* Stats Cards for this repeat */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <ModelCard models={stats?.llm ?? {}} />
+                                        <ToolCard tools={stats?.tool ?? {}} />
+                                    </div>
+
+                                    {/* Token Usage Card for this repeat */}
+                                    <TokenUsageCard
+                                        inputTokens={repeatInputTokens}
+                                        outputTokens={repeatOutputTokens}
+                                    />
 
                                     <Card>
                                         <CardHeader>
@@ -471,10 +444,10 @@ const TaskPage = () => {
                                         }
                                     />
                                 </TabsContent>
-                            ),
-                        )}
-                    </Tabs>
-                </div>
+                            );
+                        },
+                    )}
+                </Tabs>
             </div>
         </div>
     );

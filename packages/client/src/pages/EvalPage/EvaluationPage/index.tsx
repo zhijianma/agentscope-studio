@@ -39,10 +39,9 @@ import NumericalView from './MetricView/NumericalView.tsx';
 import { convertToDTO } from './utils.ts';
 // import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { EmptyPage } from '@/pages/DefaultPage/index.tsx';
-import { formatDateTime } from '@/utils/common';
+import { formatDateTime, formatNumber } from '@/utils/common';
 import { ArrayFilterOperator } from '@shared/types';
 import { Checkbox } from 'antd';
-
 const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -355,9 +354,9 @@ const EvaluationPage = () => {
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
                             <div className="text-2xl font-bold flex gap-2">
-                                {evaluation.benchmarkTotalTasks}
+                                {formatNumber(evaluation.benchmarkTotalTasks)}
                                 <div className="text-sm font-medium flex items-end mb-1">
-                                    × {evaluation.totalRepeats}
+                                    × {formatNumber(evaluation.totalRepeats)}
                                 </div>
                             </div>
                             <div className="flex items-center justify-between mt-2">
@@ -366,7 +365,9 @@ const EvaluationPage = () => {
                                         {t('table.column.finished')}
                                     </span>
                                     <span className="text-sm font-medium">
-                                        {evaluationDTO?.nCompletedTask}
+                                        {formatNumber(
+                                            evaluationDTO?.nCompletedTask,
+                                        )}
                                     </span>
                                 </div>
                                 <div className="flex flex-col items-end">
@@ -374,7 +375,9 @@ const EvaluationPage = () => {
                                         {t('table.column.incomplete')}
                                     </span>
                                     <span className="text-sm font-medium">
-                                        {evaluationDTO?.nIncompleteTask}
+                                        {formatNumber(
+                                            evaluationDTO?.nIncompleteTask,
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -391,7 +394,7 @@ const EvaluationPage = () => {
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
                             <div className="text-2xl font-bold">
-                                {evaluationDTO?.nMetric}
+                                {formatNumber(evaluationDTO?.nMetric)}
                             </div>
                             <div className="flex flex-col mt-2">
                                 <span className="text-muted-foreground text-xs">
@@ -416,10 +419,12 @@ const EvaluationPage = () => {
 
                         <div className="p-6 min-h-[5.5rem] pt-2">
                             <div className="text-2xl font-bold">
-                                {evaluationDTO
-                                    ? evaluationDTO.nPromptTokens +
-                                      evaluationDTO.nCompletionTokens
-                                    : 'N/A'}
+                                {formatNumber(
+                                    evaluationDTO
+                                        ? evaluationDTO.nPromptTokens +
+                                              evaluationDTO.nCompletionTokens
+                                        : 'N/A',
+                                )}
                             </div>
                             <div className="flex items-center justify-between mt-2">
                                 <div className="flex flex-col">
@@ -427,7 +432,9 @@ const EvaluationPage = () => {
                                         {t('common.prompt')}
                                     </span>
                                     <span className="text-sm font-medium">
-                                        {evaluationDTO?.nPromptTokens}
+                                        {formatNumber(
+                                            evaluationDTO?.nPromptTokens,
+                                        )}
                                     </span>
                                 </div>
                                 <div className="flex flex-col items-end">
@@ -435,7 +442,9 @@ const EvaluationPage = () => {
                                         {t('common.completion')}
                                     </span>
                                     <span className="text-sm font-medium">
-                                        {evaluationDTO?.nCompletionTokens}
+                                        {formatNumber(
+                                            evaluationDTO?.nCompletionTokens,
+                                        )}
                                     </span>
                                 </div>
                             </div>

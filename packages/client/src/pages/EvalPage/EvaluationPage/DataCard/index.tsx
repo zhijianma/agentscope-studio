@@ -13,6 +13,7 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from '@/components/ui/chart';
+import { formatNumber } from '@/utils/common';
 import { ChartColumnBigIcon, ChartPieIcon, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -93,7 +94,9 @@ export const ModelCard = ({ models }: Props) => {
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    {totalLlmInvocations.toLocaleString()}
+                                                    {formatNumber(
+                                                        totalLlmInvocations,
+                                                    )}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
