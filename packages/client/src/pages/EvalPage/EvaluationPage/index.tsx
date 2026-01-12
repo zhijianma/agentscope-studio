@@ -32,6 +32,7 @@ import NumericalView from './MetricView/NumericalView.tsx';
 import { convertToDTO } from './utils.ts';
 // import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { EmptyPage } from '@/pages/DefaultPage/index.tsx';
+import { formatDateTime } from '@/utils/common';
 import { ArrayFilterOperator } from '@shared/types';
 import { Checkbox } from 'antd';
 
@@ -323,7 +324,9 @@ const EvaluationPage = () => {
                                                 {t('table.column.createdAt')}
                                             </span>
                                             <span className="text-sm font-medium truncate">
-                                                {evaluation.createdAt}
+                                                {formatDateTime(
+                                                    evaluation.createdAt,
+                                                )}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { useEvaluationList } from '@/context/EvaluationListContext.tsx';
 import { useMessageApi } from '@/context/MessageApiContext.tsx';
 import { EmptyPage } from '@/pages/DefaultPage';
+import { formatDateTime } from '@/utils/common';
 import { Evaluation } from '@shared/types/evaluation.ts';
 import { Modal, TableColumnsType } from 'antd';
 import { Trash2Icon } from 'lucide-react';
@@ -70,7 +71,7 @@ const OverviewPage = () => {
             key: 'createdAt',
             render: (value, record) => (
                 <TextCell
-                    text={value}
+                    text={formatDateTime(value)}
                     selected={selectedRowKeys.includes(record.id)}
                 />
             ),
