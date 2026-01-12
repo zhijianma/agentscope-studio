@@ -52,7 +52,7 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     const columns: TableColumnsType<EvalTaskMeta> = [
         {
             key: 'id',
-            title: 'Task ID',
+            title: t('table.column.taskId'),
             render: (value) => <TextCell text={value || ''} selected={false} />,
         },
         {
@@ -167,7 +167,7 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     return (
         <div className="block pb-8">
             <div className="rounded-xl border shadow">
-                <div className="flex flex-ro items-center justify-between space-y-1.5 p-6 pb-2 text-sm font-medium">
+                <div className="flex flex-row items-center justify-between space-y-1.5 p-6 pb-2 text-sm font-medium">
                     {t('common.task')}
                 </div>
                 <div className="flex flex-col gap-3 p-6">
@@ -278,7 +278,9 @@ const EvaluationPage = () => {
                         {evaluation.evaluationName}
                     </div>
                     <div className="text-sm text-muted-foreground mb-3">
-                        Evaluation on Benchmark {evaluation.benchmarkName}
+                        {t('description.eval.benchmark-subtitle', {
+                            benchmarkName: evaluation.benchmarkName,
+                        })}
                     </div>
                 </div>
 
@@ -386,7 +388,7 @@ const EvaluationPage = () => {
                             <div className="flex items-center justify-between mt-2">
                                 <div className="flex flex-col">
                                     <span className="text-muted-foreground text-xs">
-                                        Finished
+                                        {t('table.column.finished')}
                                     </span>
                                     <span className="text-sm font-medium">
                                         {evaluationDTO?.nCompletedTask}
@@ -394,7 +396,7 @@ const EvaluationPage = () => {
                                 </div>
                                 <div className="flex flex-col items-end">
                                     <span className="text-muted-foreground text-xs">
-                                        Incomplete
+                                        {t('table.column.incomplete')}
                                     </span>
                                     <span className="text-sm font-medium">
                                         {evaluationDTO?.nIncompleteTask}
@@ -407,7 +409,7 @@ const EvaluationPage = () => {
                     <div className="rounded-xl border shadow">
                         <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-1">
                             <h3 className="tracking-tight text-sm font-medium">
-                                Metric
+                                {t('common.metric')}
                             </h3>
                             <div className="text-muted-foreground h-4 w-4">
                                 <svg
@@ -435,7 +437,8 @@ const EvaluationPage = () => {
                             </div>
                             <div className="flex flex-col mt-2">
                                 <span className="text-muted-foreground text-xs">
-                                    Numerical/Categorical
+                                    {t('common.numerical')}/
+                                    {t('common.categorical')}
                                 </span>
                                 <span className="text-sm font-medium">
                                     {evaluationDTO?.nNumericalMetric}/

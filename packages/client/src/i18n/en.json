@@ -1,5 +1,6 @@
 {
     "action": {
+        "back-to-evaluation": "Back to evaluation",
         "cancel": "Cancel",
         "clean-history": "Clean History",
         "compare": "Compare",
@@ -34,6 +35,7 @@
         "apps": "Apps",
         "average": "Average",
         "benchmark": "Benchmark",
+        "categorical": "Categorical",
         "changeLanguage": "Change Language",
         "completion": "Completion",
         "completion-average": "Completion(Avg)",
@@ -61,11 +63,14 @@
         "llm": "LLM",
         "llm-invocation": "Invocation",
         "llm-invocations": "Invocations",
+        "incomplete": "Incomplete",
         "message": "Message",
+        "metric": "Metric",
         "messages": "Messages",
         "metadata": "Metadata",
         "model-category": "Model Category",
         "name": "Name",
+        "numerical": "Numerical",
         "output": "Output",
         "output-tokens": "Output Tokens",
         "overview": "Overview",
@@ -87,6 +92,7 @@
         "traces": "Traces",
         "trace-details": "Trace Details",
         "tracing": "Tracing",
+        "trajectory": "Trajectory",
         "token-usage": "Token Usage",
         "tool": "Tool",
         "total": "Total",
@@ -109,8 +115,13 @@
     "description": {
         "eval": {
             "title": "The evaluation records from different benchmarks",
+            "benchmark-subtitle": "Evaluation on Benchmark {{benchmarkName}}",
             "llm": "The distribution of the LLM invocations",
             "llm-footer": "{{kind}} different LLM(s) were invoked for {{count}} time(s) in total",
+            "metric-description": "The distribution and repeat-wise scores for the selected metric",
+            "metric-bar-footer": "The {{metricName}} scores across different repeats",
+            "metric-cdf-footer": "The cumulative distribution function (CDF) of {{metricName}}",
+            "showing-repeats": "Showing {{count}} repeats",
             "tool": "The Top-10 tools used in your solution",
             "tool-footer": "{{kind}} different tool(s) were used for {{count}} time(s) in total"
         },
@@ -124,6 +135,7 @@
     "error": {
         "empty-input": "Input cannot be empty",
         "invalid-url": "Invalid URL: cannot get file extension",
+        "please-select-directory": "Please select a directory first",
         "project-not-found": "Project not found",
         "run-not-found": "Run not found"
     },
@@ -151,6 +163,7 @@
     "hint": {
         "empty-trace": "No data available",
         "messages": "In AgentScope, a reply consists of multiple messages with different roles and names",
+        "no-evaluation-histories": "No evaluation histories",
         "select-run": "Click on a run to view details",
         "select-message": "Click on a message to view details",
         "select-trace": "Click on a run to view trace data"
@@ -169,6 +182,7 @@
         "overview-description": "The number of runs in the last each month"
     },
     "modal": {
+        "title-import-evaluation": "Select a directory to import evaluation",
         "title-input-url": "Please input the file URL"
     },
     "notification": {
@@ -190,7 +204,8 @@
         "search-run": "Search runs",
         "search-span": "Search spans",
         "search-trace": "Search traces",
-        "input-directory-path": "Enter directory path"
+        "input-directory-path": "Enter directory path",
+        "select-metric": "Select a metric"
     },
     "status": {
         "done": "Done",
@@ -214,11 +229,13 @@
             "createdAt": "Created At",
             "evaluationDir": "Evaluation Dir",
             "finished": "Finished",
+            "incomplete": "Incomplete",
             "ground-truth": "Ground Truth",
             "id": "ID",
             "input": "Input",
             "metrics": "% Metrics",
             "name": "Name",
+            "output": "Output",
             "pending": "Pending",
             "progress": "Progress",
             "question": "Question",
@@ -226,10 +243,12 @@
             "running": "Running",
             "status": "Status",
             "tags": "Tags",
+            "taskId": "Task ID",
             "time": "Time",
             "total": "Total",
             "totalRepeats": "Total Repeats",
             "totalTokens": "Tokens",
+            "trajectory": "Trajectory",
             "duration": "Duration",
             "startTime": "Start Time",
             "project": "Project"

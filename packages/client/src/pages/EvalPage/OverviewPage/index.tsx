@@ -98,7 +98,7 @@ const OverviewPage = () => {
 
     const handleImport = useCallback(async () => {
         if (importDir === null) {
-            messageApi.error('Please select a directory first');
+            messageApi.error(t('error.please-select-directory'));
         } else {
             setImporting(true);
             importEvaluation(importDir)
@@ -127,7 +127,7 @@ const OverviewPage = () => {
                     content: 'max-h-[calc(100vh-200px)] overflow-hidden',
                     body: 'max-h-[calc(100vh-40px-200px-76px)] h-[calc(100vh-40px-200px-76px)]',
                 }}
-                title="Select a directory to import evaluation"
+                title={t('modal.title-import-evaluation')}
                 open={open}
                 onOk={handleImport}
                 loading={importing}
@@ -148,7 +148,7 @@ const OverviewPage = () => {
                         emptyText: (
                             <EmptyPage
                                 size={100}
-                                title="No evaluation histories"
+                                title={t('hint.no-evaluation-histories')}
                             />
                         ),
                     }}
