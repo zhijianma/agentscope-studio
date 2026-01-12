@@ -126,8 +126,8 @@ export const convertToDTO = (data: EvalResult | undefined) => {
 
         metrics,
 
-        llm: data.total_stats?.llm,
-        tool: data.total_stats?.tool,
+        llm: data.total_stats?.llm || {},
+        tool: data.total_stats?.tool || {},
     } as EvaluationDTO;
 };
 
