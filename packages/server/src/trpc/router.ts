@@ -486,7 +486,7 @@ export const appRouter = t.router({
                             // verify the metadata by version
                             verifyMetadataByVersion(metaData);
 
-                            // 从metadata的下划线转成驼峰，并且添加evaluationDir字段记录地址
+                            // Convert metadata from snake_case to camelCase and add evaluationDir field
                             await EvaluationDao.saveEvaluation({
                                 id: `${metaData.benchmark.name}-${metaData.createdAt}`,
                                 evaluationName: metaData.evaluation_name,

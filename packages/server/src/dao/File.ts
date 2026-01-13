@@ -212,7 +212,7 @@ export class FileDao {
 
         // Sort
         if (params.sort) {
-            // 按照sort.field数据域和sort.order排序，简单方式是全按照JSON.stringify来比较
+            // Sort by sort.field and sort.order using JSON.stringify for comparison
             tasks.sort((a, b) => {
                 const field = params.sort!.field as keyof EvalTaskMeta;
                 const order = params.sort!.order;
@@ -242,7 +242,7 @@ export class FileDao {
     }
 
     static async getAllEvaluationTags(evaluationDir: string) {
-        // 从task_meta文件中获取所有的tags，以及对应的数量
+        // Get all tags and their counts from task_meta files
         const stat = await fs.stat(evaluationDir);
         if (!stat.isDirectory()) {
             throw new Error(`${evaluationDir} is not a directory`);
@@ -307,7 +307,7 @@ export class FileDao {
 
         // Read from different repeats
 
-        // 遍历 evaluationTaskDir 下的所有子目录，每个子目录代表一个 repeat
+        // Iterate through all subdirectories in evaluationTaskDir, each represents a repeat
         const repeats: EvalTask['repeats'] = {};
         const subdirs = await fs.readdir(evaluationTaskDir);
         for (const repeatDir of subdirs) {
