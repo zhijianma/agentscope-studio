@@ -1,5 +1,5 @@
 import AsTable from '@/components/tables/AsTable';
-import { NumberCell, TagsCell, TextCell } from '@/components/tables/utils.tsx';
+import { TagsCell, TextCell } from '@/components/tables/utils.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import {
     DropdownMenu,
@@ -32,7 +32,7 @@ import {
     SearchIcon,
     SettingsIcon,
 } from 'lucide-react';
-import { Key, memo, MouseEvent, useState } from 'react';
+import { Key, memo, MouseEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import NumericalView from './MetricView/NumericalView.tsx';
@@ -55,31 +55,43 @@ const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     } = useEvaluationTasksContext();
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
 
-    const columns: TableColumnsType<EvalTaskMeta> = [
-        {
-            key: 'id',
-            title: t('table.column.taskId'),
-            render: (value) => <TextCell text={value || ''} selected={false} />,
-        },
-        {
-            key: 'input',
-            render: (value) => (
-                <TextCell
-                    text={value || ''}
-                    selected={false}
-                    className="max-w-[200px]"
-                />
-            ),
-        },
-        {
-            key: 'metrics',
-            render: (value) => <NumberCell number={value} selected={false} />,
-        },
-        {
-            key: 'tags',
-            render: (value) => <TagsCell tags={value} selected={false} />,
-        },
-    ];
+    const columns: TableColumnsType<EvalTaskMeta> = useMemo(
+        () => [
+            {
+                key: 'id',
+                title: t('table.column.taskId'),
+                render: (value: string) => (
+                    <TextCell text={value || ''} selected={false} />
+                ),
+            },
+            {
+                key: 'input',
+                render: (value: string) => (
+                    <TextCell
+                        text={value || ''}
+                        selected={false}
+                        className="max-w-[200px]"
+                    />
+                ),
+            },
+            {
+                key: 'metrics',
+                render: (value: string[]) => (
+                    <TextCell
+                        text={value.length.toString() || '0'}
+                        selected={false}
+                    />
+                ),
+            },
+            {
+                key: 'tags',
+                render: (value: string[]) => (
+                    <TagsCell tags={value} selected={false} />
+                ),
+            },
+        ],
+        [t],
+    );
 
     const handleTagFilterChange = (tag: string) => {
         setTableRequestParams((prev) => {
@@ -422,7 +434,7 @@ const EvaluationPage = () => {
                                 {formatNumber(
                                     evaluationDTO
                                         ? evaluationDTO.nPromptTokens +
-                                              evaluationDTO.nCompletionTokens
+                                        evaluationDTO.nCompletionTokens
                                         : 'N/A',
                                 )}
                             </div>
