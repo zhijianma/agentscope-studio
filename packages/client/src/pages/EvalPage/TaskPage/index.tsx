@@ -30,6 +30,9 @@ import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import ChartPage from './ChartPage';
+
+import SyntaxHighlighter from 'react-syntax-highlighter';
 const TokenUsageCard = memo(
     ({
         inputTokens,
@@ -167,15 +170,17 @@ const ToolStep = memo(
                             <div className="text-xs text-muted-foreground mb-1">
                                 {t('common.result')}:
                             </div>
-                            <pre className="text-sm whitespace-pre-wrap break-all">
+                            <div className="text-sm whitespace-pre-wrap break-all max-h-64 overflow-auto">
                                 {typeof toolResultBlock.output === 'string'
                                     ? toolResultBlock.output
-                                    : JSON.stringify(
-                                          toolResultBlock.output,
-                                          null,
-                                          2,
-                                      )}
-                            </pre>
+                                    : <SyntaxHighlighter language="json"
+                                        customStyle={{
+                                            margin: 0,
+                                            borderRadius: '8px',
+                                        }}>
+                                        {JSON.stringify(toolResultBlock.output, null, 2)}
+                                    </SyntaxHighlighter>}
+                            </div>
                         </div>
                     )}
                 </CollapsibleContent>
@@ -248,7 +253,6 @@ const TaskPage = () => {
         navigate(`/eval/${evalId}`);
     };
 
-    // Calculate progress from task.repeats and total_repeats
     const totalRepeats = task.total_repeats || Object.keys(task.repeats).length;
     const completedRepeats = Object.values(task.repeats).filter(
         (repeat) => repeat.solution !== undefined,
@@ -264,33 +268,6 @@ const TaskPage = () => {
         }
         return t('table.column.incomplete');
     };
-
-    // Aggregate stats from all repeats for overview
-    const aggregatedLlm: Record<string, number> = {};
-    const aggregatedTool: Record<string, number> = {};
-    let aggregatedInputTokens = 0;
-    let aggregatedOutputTokens = 0;
-
-    Object.values(task.repeats).forEach((repeatData) => {
-        const stats = repeatData.stats;
-        if (!stats) return;
-
-        // Aggregate LLM
-        Object.entries(stats.llm || {}).forEach(([model, count]) => {
-            aggregatedLlm[model] = (aggregatedLlm[model] || 0) + count;
-        });
-
-        // Aggregate Tool
-        Object.entries(stats.tool || {}).forEach(([tool, count]) => {
-            aggregatedTool[tool] = (aggregatedTool[tool] || 0) + count;
-        });
-
-        // Aggregate Tokens
-        Object.values(stats.chat_usage || {}).forEach((usage) => {
-            aggregatedInputTokens += usage.input_tokens || 0;
-            aggregatedOutputTokens += usage.output_tokens || 0;
-        });
-    });
 
     return (
         <div className="flex-1 h-full overflow-y-auto">
@@ -333,28 +310,36 @@ const TaskPage = () => {
                 </div>
 
                 {/* Input Card */}
-                <div className="rounded-xl border shadow">
-                    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
-                        <h3 className="tracking-tight text-sm font-medium">
-                            {t('common.input')}
-                        </h3>
-                    </div>
-                    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
-                        {task.meta.input}
-                    </div>
-                </div>
-
-                {/* Ground Truth Card */}
-                <div className="rounded-xl border shadow">
-                    <div className="p-6 flex flex-col justify-between space-y-0 pb-1">
-                        <h3 className="tracking-tight text-sm font-medium">
-                            {t('table.column.ground-truth')}
-                        </h3>
-                    </div>
-                    <div className="p-6 min-h-[5.5rem] pt-2 space-y-4">
-                        {JSON.stringify(task.meta.ground_truth, null, 2)}
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('common.input')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="max-h-64 overflow-auto">
+                        <SyntaxHighlighter language="string"
+                            wrapLongLines={true}
+                            customStyle={{
+                                margin: 0,
+                                borderRadius: '8px',
+                            }}>
+                            {task.meta.input}
+                        </SyntaxHighlighter>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('table.column.ground-truth')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="max-h-64 overflow-auto">
+                        <SyntaxHighlighter language="json"
+                            wrapLongLines={true}
+                            customStyle={{
+                                margin: 0,
+                                borderRadius: '8px',
+                            }}>
+                            {JSON.stringify(task.meta.ground_truth, null, 2)}
+                        </SyntaxHighlighter>
+                    </CardContent>
+                </Card>
 
                 {/* Tabs with Overview and Repeats */}
                 <Tabs defaultValue="overview" className="w-full">
@@ -374,17 +359,7 @@ const TaskPage = () => {
                         value="overview"
                         className="flex flex-col gap-4"
                     >
-                        {/* LLM and Tool Stats Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <ModelCard models={aggregatedLlm} />
-                            <ToolCard tools={aggregatedTool} />
-                        </div>
-
-                        {/* Token Usage Card */}
-                        <TokenUsageCard
-                            inputTokens={aggregatedInputTokens}
-                            outputTokens={aggregatedOutputTokens}
-                        />
+                        <ChartPage />
                     </TabsContent>
 
                     {Object.entries(task.repeats).map(
@@ -392,17 +367,17 @@ const TaskPage = () => {
                             const stats = repeatData.stats;
                             const repeatInputTokens = stats
                                 ? Object.values(stats.chat_usage || {}).reduce(
-                                      (acc, usage) =>
-                                          acc + (usage.input_tokens || 0),
-                                      0,
-                                  )
+                                    (acc, usage) =>
+                                        acc + (usage.input_tokens || 0),
+                                    0,
+                                )
                                 : 0;
                             const repeatOutputTokens = stats
                                 ? Object.values(stats.chat_usage || {}).reduce(
-                                      (acc, usage) =>
-                                          acc + (usage.output_tokens || 0),
-                                      0,
-                                  )
+                                    (acc, usage) =>
+                                        acc + (usage.output_tokens || 0),
+                                    0,
+                                )
                                 : 0;
 
                             return (
@@ -429,10 +404,20 @@ const TaskPage = () => {
                                                 {t('common.output')}
                                             </CardTitle>
                                         </CardHeader>
-                                        <CardContent>
-                                            {JSON.stringify(
-                                                repeatData.solution?.output,
-                                            ) || ''}
+                                        <CardContent className="max-h-64 overflow-auto">
+                                            <SyntaxHighlighter
+                                                language="json"
+                                                wrapLongLines={true}
+                                                customStyle={{
+                                                    margin: 0,
+                                                    borderRadius: '8px',
+                                                }}>
+                                                {JSON.stringify(
+                                                    repeatData.solution?.output,
+                                                    null,
+                                                    2,
+                                                ) || ''}
+                                            </SyntaxHighlighter>
                                         </CardContent>
                                     </Card>
 
@@ -449,7 +434,7 @@ const TaskPage = () => {
                     )}
                 </Tabs>
             </div>
-        </div>
+        </div >
     );
 };
 
