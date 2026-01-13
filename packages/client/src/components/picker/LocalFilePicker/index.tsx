@@ -40,7 +40,6 @@ const LocalFilePicker = ({ onSelect, ...restProps }: Props) => {
     const [currentPath, setCurrentPath] = useState<string>(getInitialPath());
     const [treeData, setTreeData] = useState<CustomTreeDataNode[]>([]);
 
-    // Use trpc mutation for listing directory
     const listDirMutation = trpc.listDir.useMutation();
 
     // Convert FileItem to CustomTreeDataNode
@@ -56,7 +55,6 @@ const LocalFilePicker = ({ onSelect, ...restProps }: Props) => {
         };
     }, []);
 
-    // Fetch directory data using trpc
     const fetchDirData = useCallback(
         async (path: string): Promise<CustomTreeDataNode[]> => {
             try {

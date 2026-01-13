@@ -1,6 +1,7 @@
 import AsTable from '@/components/tables/AsTable';
 import { TagsCell, TextCell } from '@/components/tables/utils.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,7 +22,10 @@ import {
     EvaluationTasksContextProvider,
     useEvaluationTasksContext,
 } from '@/context/EvaluationTasksContext.tsx';
+import { EmptyPage } from '@/pages/DefaultPage/index.tsx';
 import { ModelCard, ToolCard } from '@/pages/EvalPage/EvaluationPage/DataCard';
+import { formatDateTime, formatNumber } from '@/utils/common';
+import { ArrayFilterOperator } from '@shared/types';
 import { EvalTaskMeta } from '@shared/types/evaluation.ts';
 import { TableColumnsType } from 'antd';
 import {
@@ -37,11 +41,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import NumericalView from './MetricView/NumericalView.tsx';
 import { convertToDTO } from './utils.ts';
-// import { Checkbox } from '@/components/ui/checkbox.tsx';
-import { EmptyPage } from '@/pages/DefaultPage/index.tsx';
-import { formatDateTime, formatNumber } from '@/utils/common';
-import { ArrayFilterOperator } from '@shared/types';
-import { Checkbox } from 'antd';
 const TasksTable = memo(({ evaluationId }: { evaluationId: string }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
