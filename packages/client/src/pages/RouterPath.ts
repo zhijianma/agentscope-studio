@@ -15,5 +15,4 @@ export enum RouterPath {
 
     EVAL_EVALUATION = ':evalId',
     EVAL_TASK = ':evalId/:taskId',
-    EVAL_TASK_COMPARISON = ':evalId/:taskId/compare',
 }
