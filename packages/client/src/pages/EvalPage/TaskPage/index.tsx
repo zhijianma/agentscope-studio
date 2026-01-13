@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button.tsx';
 import {
     Card,
     CardContent,
@@ -25,7 +26,12 @@ import {
     ToolUseBlock,
 } from '@shared/types';
 import { EvalTrajectory } from '@shared/types/evaluation.ts';
-import { ChevronLeftIcon, CpuIcon, SettingsIcon } from 'lucide-react';
+import {
+    ChevronLeftIcon,
+    CpuIcon,
+    GitCompareIcon,
+    SettingsIcon,
+} from 'lucide-react';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -248,6 +254,10 @@ const TaskPage = () => {
         navigate(`/eval/${evalId}`);
     };
 
+    const handleCompare = () => {
+        navigate(`/eval/${evalId}/${task.meta.id}/compare`);
+    };
+
     // Calculate progress from task.repeats and total_repeats
     const totalRepeats = task.total_repeats || Object.keys(task.repeats).length;
     const completedRepeats = Object.values(task.repeats).filter(
@@ -311,9 +321,9 @@ const TaskPage = () => {
                     </div>
                 </div>
 
-                {/* Status Card */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="rounded-xl border shadow">
+                {/* Status Card and Compare Mode Button */}
+                <div className="flex items-start gap-4">
+                    <div className="rounded-xl border shadow flex-1 max-w-xs">
                         <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-1">
                             <h3 className="tracking-tight text-sm font-medium">
                                 {t('common.status')}
@@ -330,6 +340,18 @@ const TaskPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Compare Button */}
+                    {Object.keys(task.repeats).length > 1 && (
+                        <Button
+                            variant="outline"
+                            className="gap-2"
+                            onClick={handleCompare}
+                        >
+                            <GitCompareIcon className="size-4" />
+                            {t('action.compare')}
+                        </Button>
+                    )}
                 </div>
 
                 {/* Input Card */}
@@ -356,7 +378,7 @@ const TaskPage = () => {
                     </div>
                 </div>
 
-                {/* Tabs with Overview and Repeats */}
+                {/* Tabs */}
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList>
                         <TabsTrigger value="overview">

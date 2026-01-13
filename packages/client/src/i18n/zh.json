@@ -1,8 +1,14 @@
 {
     "action": {
         "back-to-evaluation": "返回评测",
+        "back-to-task": "返回任务",
         "cancel": "取消",
+        "compare-mode": "比对模式",
+        "exit-compare": "退出比对",
         "clean-history": "清除历史",
+        "select-all": "全选",
+        "unselect-all": "取消全选",
+        "select-repeats": "选择重复项",
         "compare": "比较",
         "delete": "删除",
         "focus-on-latest-run": "自动切换到最新运行",
@@ -37,9 +43,11 @@
         "benchmark": "基准数据集",
         "categorical": "分类型",
         "changeLanguage": "切换语言",
+        "comparison": "对比",
         "completion": "生成内容",
         "completion-average": "生成内容(Avg)",
         "contact": "联系",
+        "differences": "处差异",
         "dashboard": "运行监控",
         "data-view": "数据视图",
         "data-view-description": "当前运行实例的统计信息",
@@ -67,6 +75,7 @@
         "message": "消息",
         "metric": "指标",
         "messages": "消息",
+        "missing": "缺失",
         "metadata": "元数据",
         "model-category": "模型种类",
         "name": "名称",
@@ -101,6 +110,8 @@
         "total-tokens": "总 Token 数",
         "tutorial": "教程",
         "saving-directory": "保存目录",
+        "success": "成功",
+        "failed": "失败",
         "span-name": "Span 名称",
         "span-number": "% Spans",
         "span-kind": "Span 类型",
@@ -116,6 +127,7 @@
         "no-data-available": "暂无数据"
     },
     "description": {
+        "comparison-subtitle": "并排对比 {{count}} 个重复项",
         "eval": {
             "title": "智能体应用的评测记录",
             "benchmark-subtitle": "基准数据集 {{benchmarkName}} 的评测",
@@ -165,8 +177,11 @@
     },
     "hint": {
         "empty-trace": "数据为空",
+        "differences-found": "发现 {{count}} 处差异",
         "messages": "AgentScope 一次回复（reply）可能包含多个消息，每条消息有对应的 role 和 name 字段",
         "no-evaluation-histories": "暂无评测历史",
+        "select-at-least-2": "请选择至少 2 个重复项进行对比",
+        "select-repeats-to-compare": "选择要对比的重复项",
         "select-run": "点击运行实例以查看详细数据",
         "select-message": "点击消息以查看详细数据",
         "select-trace": "点击运行实例以查看跟踪数据"
