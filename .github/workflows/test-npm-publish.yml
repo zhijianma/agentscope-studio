@@ -1,8 +1,12 @@
 name: Test NPM Publish (Dry Run)
 
-# 手动触发测试
 on:
+    # 手动触发
     workflow_dispatch:
+    # 推送到 test/* 分支时自动触发
+    push:
+        branches:
+            - 'test/npm_dryrun'
 
 permissions:
     contents: read
