@@ -6,7 +6,6 @@ on:
 
 permissions:
     contents: read
-    id-token: write  # 为将来 OIDC 准备
 
 concurrency:
     group: publish-npm-${{ github.ref }}
@@ -23,7 +22,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
+                  node-version: '20'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Get version from package.json
@@ -44,34 +43,31 @@ jobs:
               run: |
                   PACKAGE_V="${{ steps.package_version.outputs.version }}"
                   RELEASE_V="${{ steps.release_version.outputs.version }}"
-
-                  echo "Comparing versions:"
-                  echo "  package.json: $PACKAGE_V"
-                  echo "  Release tag:  $RELEASE_V"
-
                   if [ "$PACKAGE_V" != "$RELEASE_V" ]; then
-                    echo ""
-                    echo "::error::❌ Version mismatch detected!"
-                    echo "::error::package.json version: $PACKAGE_V"
-                    echo "::error::Release tag version: $RELEASE_V"
-                    echo "::error::Please ensure package.json version matches the Release tag"
+                    echo "::error::❌ Version mismatch! package.json: $PACKAGE_V, tag: $RELEASE_V"
                     exit 1
                   fi
+                  echo "✅ Version match: $PACKAGE_V"
 
-                  echo "✅ Version verification passed!"
-
-            - name: Check if version already exists on npm
+            - name: Check if version exists on npm
               id: npm_check
               run: |
                   PKG_NAME=$(node -p "require('./package.json').name")
                   VERSION="${{ steps.package_version.outputs.version }}"
-                  echo "🔍 Checking if $PKG_NAME@$VERSION exists on npm..."
-
                   if npm view "$PKG_NAME@$VERSION" version >/dev/null 2>&1; then
-                    echo "⚠️ Version $VERSION already exists on npm, skipping publish"
+                    echo ""
+                    echo "╔════════════════════════════════════════════════════════════╗"
+                    echo "║  ⚠️  VERSION ALREADY EXISTS - SKIPPING PUBLISH              ║"
+                    echo "╠════════════════════════════════════════════════════════════╣"
+                    echo "║  Package: $PKG_NAME"
+                    echo "║  Version: $VERSION"
+                    echo "║  Status:  Already published on npm"
+                    echo "╚════════════════════════════════════════════════════════════╝"
+                    echo ""
+                    echo "::warning::⚠️ $PKG_NAME@$VERSION already exists on npm, skipping publish"
                     echo "already_exists=true" >> $GITHUB_OUTPUT
                   else
-                    echo "✅ Version $VERSION does not exist on npm, proceeding with publish"
+                    echo "✅ $PKG_NAME@$VERSION not found on npm, will publish"
                     echo "already_exists=false" >> $GITHUB_OUTPUT
                   fi
 
@@ -83,40 +79,38 @@ jobs:
               if: steps.npm_check.outputs.already_exists == 'false'
               run: npm run build
 
-            # ============================================================
-            # 首次发布：使用 Token 模式
-            # 包发布成功后，配置 Trusted Publisher，然后切换到 OIDC 模式
-            # ============================================================
-            - name: Publish to NPM (Token mode - for first publish)
+            - name: Publish to NPM
               if: steps.npm_check.outputs.already_exists == 'false'
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: npm publish --access public
 
-            # ============================================================
-            # 将来切换到 OIDC 模式后，取消上面的注释，使用下面的：
-            # ============================================================
-            # - name: Publish to NPM (OIDC mode)
-            #   if: steps.npm_check.outputs.already_exists == 'false'
-            #   run: npm publish --access public --provenance
-
-            - name: Success notification
-              if: success() && steps.npm_check.outputs.already_exists == 'false'
+            - name: Success
+              if: steps.npm_check.outputs.already_exists == 'false'
               run: |
                   PKG_NAME=$(node -p "require('./package.json').name")
                   VERSION="${{ steps.package_version.outputs.version }}"
-                  echo "🎉 Successfully published $PKG_NAME@$VERSION to NPM!"
-                  echo "📦 https://www.npmjs.com/package/$PKG_NAME/v/$VERSION"
                   echo ""
-                  echo "📌 下一步：配置 Trusted Publisher"
-                  echo "   1. 访问 https://www.npmjs.com/package/$PKG_NAME/access"
-                  echo "   2. 找到 Trusted Publishers 部分"
-                  echo "   3. 添加 GitHub Actions 配置"
-                  echo "   4. 然后修改此 workflow 切换到 OIDC 模式"
+                  echo "╔════════════════════════════════════════════════════════════╗"
+                  echo "║  🎉  PUBLISH SUCCESS                                        ║"
+                  echo "╠════════════════════════════════════════════════════════════╣"
+                  echo "║  Package: $PKG_NAME"
+                  echo "║  Version: $VERSION"
+                  echo "║  URL:     https://www.npmjs.com/package/$PKG_NAME"
+                  echo "╚════════════════════════════════════════════════════════════╝"
+                  echo ""
 
-            - name: Skip notification
+            - name: Skipped
               if: steps.npm_check.outputs.already_exists == 'true'
               run: |
                   PKG_NAME=$(node -p "require('./package.json').name")
                   VERSION="${{ steps.package_version.outputs.version }}"
-                  echo "⏭️ Skipped: $PKG_NAME@$VERSION already exists on npm"
+                  echo ""
+                  echo "╔════════════════════════════════════════════════════════════╗"
+                  echo "║  ⏭️  PUBLISH SKIPPED                                        ║"
+                  echo "╠════════════════════════════════════════════════════════════╣"
+                  echo "║  Package: $PKG_NAME"
+                  echo "║  Version: $VERSION"
+                  echo "║  Reason:  Version already exists on npm"
+                  echo "╚════════════════════════════════════════════════════════════╝"
+                  echo ""
