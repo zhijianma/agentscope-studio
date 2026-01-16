@@ -6,6 +6,7 @@ on:
 
 permissions:
     contents: read
+    id-token: write
 
 concurrency:
     group: publish-npm-${{ github.ref }}
@@ -83,7 +84,7 @@ jobs:
               if: steps.npm_check.outputs.already_exists == 'false'
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-              run: npm publish --access public
+              run: npm publish --provenance --access public
 
             - name: Success
               if: steps.npm_check.outputs.already_exists == 'false'
