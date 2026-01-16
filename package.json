@@ -1,5 +1,5 @@
 {
-    "name": "@agentscope/studio",
+    "name": "@zhijianma/studio",
     "workspaces": [
         "packages/*"
     ],
@@ -8,7 +8,7 @@
         "@trpc/client": "^11.0.1",
         "@trpc/react-query": "^11.0.1"
     },
-    "version": "1.0.7",
+    "version": "1.0.12",
     "engines": {
         "node": ">=20.0.0",
         "npm": ">=10.0.0"
