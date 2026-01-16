@@ -29,20 +29,6 @@ jobs:
                   echo "📦 Package: $PKG_NAME"
                   echo "📌 Version: $PKG_VERSION"
 
-            - name: Check if package exists on npm
-              id: pkg_check
-              run: |
-                  PKG_NAME="${{ steps.pkg_info.outputs.name }}"
-                  echo "🔍 Checking if package $PKG_NAME exists on npm..."
-
-                  if npm view "$PKG_NAME" name >/dev/null 2>&1; then
-                    echo "✅ Package exists on npm"
-                    echo "exists=true" >> $GITHUB_OUTPUT
-                  else
-                    echo "📦 Package does not exist yet (first publish)"
-                    echo "exists=false" >> $GITHUB_OUTPUT
-                  fi
-
             - name: Check if version already exists on npm
               if: steps.pkg_check.outputs.exists == 'true'
               run: |
@@ -62,7 +48,7 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: 🧪 Dry run publish (不会实际发布)
+            - name: 🧪 Dry run publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
