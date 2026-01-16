@@ -6,7 +6,7 @@ permissions:
     contents: read
 
 jobs:
-    build-test:
+    npm-build-test:
         runs-on: ubuntu-latest
 
         steps:
@@ -48,19 +48,20 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: 🧪 Dry run publish
+            - name: Dry Run Publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
                   echo "🧪 Testing npm publish with --dry-run..."
                   npm publish --access public --dry-run
 
-            - name: ✅ Test passed
+            - name: Dry Run Result
               run: |
                   PKG_EXISTS="${{ steps.pkg_check.outputs.exists }}"
+
                   if [ "$PKG_EXISTS" = "false" ]; then
-                    echo "🎉 npm publish dry-run failed!"
+                    echo "❌ npm publish dry-run failed!"
                     exit 1
                   else
-                    echo "🎉 npm publish dry-run passed!"
+                    echo "✅ npm publish dry-run passed!"
                   fi
