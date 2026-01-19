@@ -5,6 +5,10 @@ on: [push, pull_request]
 permissions:
     contents: read
 
+concurrency:
+    group: npm-build-test-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     npm-build-test:
         runs-on: ubuntu-latest
@@ -16,18 +20,15 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
+                  node-version: '20'
                   registry-url: 'https://registry.npmjs.org'
 
-            - name: Get package info
-              id: pkg_info
+            - name: Get version from package.json
+              id: package_version
               run: |
-                  PKG_NAME=$(node -p "require('./package.json').name")
-                  PKG_VERSION=$(node -p "require('./package.json').version")
-                  echo "name=$PKG_NAME" >> $GITHUB_OUTPUT
-                  echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
-                  echo "📦 Package: $PKG_NAME"
-                  echo "📌 Version: $PKG_VERSION"
+                  PACKAGE_VERSION=$(node -p "require('./package.json').version")
+                  echo "version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+                  echo "📦 Package.json version: $PACKAGE_VERSION"
 
             - name: Check if version exists on npm
               id: npm_check
@@ -37,41 +38,57 @@ jobs:
                   if npm view "$PKG_NAME@$VERSION" version >/dev/null 2>&1; then
                     echo ""
                     echo "╔════════════════════════════════════════════════════════════╗"
-                    echo "║  ⚠️  VERSION ALREADY EXISTS - SKIPPING PUBLISH              ║"
+                    echo "║  ⚠️  VERSION ALREADY EXISTS ON NPM                          ║"
                     echo "╠════════════════════════════════════════════════════════════╣"
                     echo "║  Package: $PKG_NAME"
                     echo "║  Version: $VERSION"
                     echo "║  Status:  Already published on npm"
                     echo "╚════════════════════════════════════════════════════════════╝"
                     echo ""
-                    echo "::warning::⚠️ $PKG_NAME@$VERSION already exists on npm, skipping publish"
+                    echo "::warning::⚠️ $PKG_NAME@$VERSION already exists on npm"
                     echo "already_exists=true" >> $GITHUB_OUTPUT
                   else
-                    echo "✅ $PKG_NAME@$VERSION not found on npm, will publish"
+                    echo "✅ $PKG_NAME@$VERSION not found on npm, ready to publish"
                     echo "already_exists=false" >> $GITHUB_OUTPUT
                   fi
+
             - name: Install dependencies
-              if: steps.npm_check.outputs.already_exists == 'false'
               run: npm ci
 
             - name: Build
-              if: steps.npm_check.outputs.already_exists == 'false'
               run: npm run build
 
             - name: Dry Run Publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-              run: |
-                  echo "🧪 Testing npm publish with --dry-run..."
-                  npm publish --access public --dry-run
+              run: npm publish --access public --dry-run
 
-            - name: Dry Run Result
+            - name: Success
+              if: steps.npm_check.outputs.already_exists == 'false'
               run: |
-                  PKG_EXISTS="${{ steps.pkg_check.outputs.exists }}"
+                  PKG_NAME=$(node -p "require('./package.json').name")
+                  VERSION="${{ steps.package_version.outputs.version }}"
+                  echo ""
+                  echo "╔════════════════════════════════════════════════════════════╗"
+                  echo "║  ✅  DRY RUN SUCCESS                                        ║"
+                  echo "╠════════════════════════════════════════════════════════════╣"
+                  echo "║  Package: $PKG_NAME"
+                  echo "║  Version: $VERSION"
+                  echo "║  Status:  Ready to publish (new version)"
+                  echo "╚════════════════════════════════════════════════════════════╝"
+                  echo ""
 
-                  if [ "$PKG_EXISTS" = "false" ]; then
-                    echo "❌ npm publish dry-run failed!"
-                    exit 1
-                  else
-                    echo "✅ npm publish dry-run passed!"
-                  fi
+            - name: Already Published
+              if: steps.npm_check.outputs.already_exists == 'true'
+              run: |
+                  PKG_NAME=$(node -p "require('./package.json').name")
+                  VERSION="${{ steps.package_version.outputs.version }}"
+                  echo ""
+                  echo "╔════════════════════════════════════════════════════════════╗"
+                  echo "║  ⚠️  DRY RUN COMPLETE (VERSION EXISTS)                      ║"
+                  echo "╠════════════════════════════════════════════════════════════╣"
+                  echo "║  Package: $PKG_NAME"
+                  echo "║  Version: $VERSION"
+                  echo "║  Status:  Version already exists on npm"
+                  echo "╚════════════════════════════════════════════════════════════╝"
+                  echo ""

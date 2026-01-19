@@ -7,6 +7,10 @@ on:
 permissions:
     contents: read
 
+concurrency:
+    group: publish-npm-${{ github.ref }}
+    cancel-in-progress: false
+
 jobs:
     publish:
         runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
+                  node-version: '20'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Get version from package.json
@@ -70,11 +74,6 @@ jobs:
             - name: Build
               if: steps.npm_check.outputs.already_exists == 'false'
               run: npm run build
-
-            - name: Publish to NPM
-              run: npm publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish to NPM
               if: steps.npm_check.outputs.already_exists == 'false'
