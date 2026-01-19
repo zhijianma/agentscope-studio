@@ -78,7 +78,7 @@ jobs:
                   echo "╚════════════════════════════════════════════════════════════╝"
                   echo ""
 
-            - name: Already Published
+            - name: Skipped
               if: steps.npm_check.outputs.already_exists == 'true'
               run: |
                   PKG_NAME=$(node -p "require('./package.json').name")
