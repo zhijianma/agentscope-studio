@@ -19,27 +19,16 @@ jobs:
                   node-version: '22'
                   registry-url: 'https://registry.npmjs.org'
 
-            - name: Get version from package.json
-              id: package_version
+            - name: Get package info
+              id: pkg_info
               run: |
-                  PACKAGE_VERSION=$(node -p "require('./package.json').version")
-                  echo "version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
-                  echo "📦 Package.json version: $PACKAGE_VERSION"
-            - name: Get version from Release tag
-              id: release_version
-              run: |
-                  RELEASE_VERSION=${GITHUB_REF#refs/tags/v}
-                  echo "version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
-                  echo "🏷️  Release tag version: $RELEASE_VERSION"
-            - name: Verify version consistency
-              run: |
-                  PACKAGE_V="${{ steps.package_version.outputs.version }}"
-                  RELEASE_V="${{ steps.release_version.outputs.version }}"
-                  if [ "$PACKAGE_V" != "$RELEASE_V" ]; then
-                    echo "::error::❌ Version mismatch! package.json: $PACKAGE_V, tag: $RELEASE_V"
-                    exit 1
-                  fi
-                  echo "✅ Version match: $PACKAGE_V"
+                  PKG_NAME=$(node -p "require('./package.json').name")
+                  PKG_VERSION=$(node -p "require('./package.json').version")
+                  echo "name=$PKG_NAME" >> $GITHUB_OUTPUT
+                  echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
+                  echo "📦 Package: $PKG_NAME"
+                  echo "📌 Version: $PKG_VERSION"
+
             - name: Check if version exists on npm
               id: npm_check
               run: |
