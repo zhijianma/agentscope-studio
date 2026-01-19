@@ -6,7 +6,7 @@ on:
 
 env:
     REGISTRY: docker.io
-    IMAGE_NAME: agentscope/studio
+    IMAGE_NAME: zhijianma/studio
 
 jobs:
     build-push:
