@@ -433,7 +433,7 @@ const EvaluationPage = () => {
                                 {formatNumber(
                                     evaluationDTO
                                         ? evaluationDTO.nPromptTokens +
-                                        evaluationDTO.nCompletionTokens
+                                              evaluationDTO.nCompletionTokens
                                         : 'N/A',
                                 )}
                             </div>

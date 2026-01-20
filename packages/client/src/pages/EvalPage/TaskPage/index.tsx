@@ -171,15 +171,23 @@ const ToolStep = memo(
                                 {t('common.result')}:
                             </div>
                             <div className="text-sm whitespace-pre-wrap break-all max-h-64 overflow-auto">
-                                {typeof toolResultBlock.output === 'string'
-                                    ? toolResultBlock.output
-                                    : <SyntaxHighlighter language="json"
+                                {typeof toolResultBlock.output === 'string' ? (
+                                    toolResultBlock.output
+                                ) : (
+                                    <SyntaxHighlighter
+                                        language="json"
                                         customStyle={{
                                             margin: 0,
                                             borderRadius: '8px',
-                                        }}>
-                                        {JSON.stringify(toolResultBlock.output, null, 2)}
-                                    </SyntaxHighlighter>}
+                                        }}
+                                    >
+                                        {JSON.stringify(
+                                            toolResultBlock.output,
+                                            null,
+                                            2,
+                                        )}
+                                    </SyntaxHighlighter>
+                                )}
                             </div>
                         </div>
                     )}
@@ -315,12 +323,14 @@ const TaskPage = () => {
                         <CardTitle>{t('common.input')}</CardTitle>
                     </CardHeader>
                     <CardContent className="max-h-64 overflow-auto">
-                        <SyntaxHighlighter language="string"
+                        <SyntaxHighlighter
+                            language="string"
                             wrapLongLines={true}
                             customStyle={{
                                 margin: 0,
                                 borderRadius: '8px',
-                            }}>
+                            }}
+                        >
                             {task.meta.input}
                         </SyntaxHighlighter>
                     </CardContent>
@@ -330,12 +340,14 @@ const TaskPage = () => {
                         <CardTitle>{t('table.column.ground-truth')}</CardTitle>
                     </CardHeader>
                     <CardContent className="max-h-64 overflow-auto">
-                        <SyntaxHighlighter language="json"
+                        <SyntaxHighlighter
+                            language="json"
                             wrapLongLines={true}
                             customStyle={{
                                 margin: 0,
                                 borderRadius: '8px',
-                            }}>
+                            }}
+                        >
                             {JSON.stringify(task.meta.ground_truth, null, 2)}
                         </SyntaxHighlighter>
                     </CardContent>
@@ -367,17 +379,17 @@ const TaskPage = () => {
                             const stats = repeatData.stats;
                             const repeatInputTokens = stats
                                 ? Object.values(stats.chat_usage || {}).reduce(
-                                    (acc, usage) =>
-                                        acc + (usage.input_tokens || 0),
-                                    0,
-                                )
+                                      (acc, usage) =>
+                                          acc + (usage.input_tokens || 0),
+                                      0,
+                                  )
                                 : 0;
                             const repeatOutputTokens = stats
                                 ? Object.values(stats.chat_usage || {}).reduce(
-                                    (acc, usage) =>
-                                        acc + (usage.output_tokens || 0),
-                                    0,
-                                )
+                                      (acc, usage) =>
+                                          acc + (usage.output_tokens || 0),
+                                      0,
+                                  )
                                 : 0;
 
                             return (
@@ -411,7 +423,8 @@ const TaskPage = () => {
                                                 customStyle={{
                                                     margin: 0,
                                                     borderRadius: '8px',
-                                                }}>
+                                                }}
+                                            >
                                                 {JSON.stringify(
                                                     repeatData.solution?.output,
                                                     null,
@@ -434,7 +447,7 @@ const TaskPage = () => {
                     )}
                 </Tabs>
             </div>
-        </div >
+        </div>
     );
 };
 

@@ -343,6 +343,7 @@ export class FileDao {
             if (metricsDirStat.isDirectory()) {
                 // Read all json files in the metricsDirPath, each represents a metric result
                 const metricFiles = await fs.readdir(metricsDirPath);
+
                 for (const metricFile of metricFiles) {
                     if (metricFile.endsWith('.json')) {
                         const metricFilePath = path.join(
@@ -353,7 +354,8 @@ export class FileDao {
                             await this.getJSONFile<Record<string, unknown>>(
                                 metricFilePath,
                             );
-                        if (metricData.name && metricData.result) {
+
+                        if (metricData.name && metricData.result !== null) {
                             repeats[repeatDir].result =
                                 repeats[repeatDir].result || {};
                             repeats[repeatDir].result[
